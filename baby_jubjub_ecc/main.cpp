@@ -474,7 +474,6 @@ void test_eddsa() {
 // test inputs taken from ../test/test_pedersen.py
 template<typename ppT>
 void test_pedersen() {
-    typedef libff::Fr<default_r1cs_ppzksnark_pp> FieldT;
     typedef libff::Fr<ppT> FieldT;
     protoboard<FieldT> pb;
     std::shared_ptr<pedersen_commitment<FieldT>> jubjub_pedersen_commitment;
@@ -539,19 +538,19 @@ void test_pedersen() {
     jubjub_pedersen_commitment.reset(new pedersen_commitment<FieldT> (pb,a,d, base_x, base_y, h_x, h_y,commitment_x, commitment_y,m, r));
     jubjub_pedersen_commitment->generate_r1cs_constraints();
     jubjub_pedersen_commitment->generate_r1cs_witness();
-    const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
+    //const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
 
-    const r1cs_ppzksnark_keypair<default_r1cs_ppzksnark_pp> keypair = r1cs_ppzksnark_generator<default_r1cs_ppzksnark_pp>(constraint_system);
+    //const r1cs_ppzksnark_keypair<default_r1cs_ppzksnark_pp> keypair = r1cs_ppzksnark_generator<default_r1cs_ppzksnark_pp>(constraint_system);
 
-    const r1cs_ppzksnark_proof<default_r1cs_ppzksnark_pp> proof = r1cs_ppzksnark_prover<default_r1cs_ppzksnark_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
+    //const r1cs_ppzksnark_proof<default_r1cs_ppzksnark_pp> proof = r1cs_ppzksnark_prover<default_r1cs_ppzksnark_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
 
-    bool verified = r1cs_ppzksnark_verifier_strong_IC<default_r1cs_ppzksnark_pp>(keypair.vk, pb.primary_input(), proof);
+    //bool verified = r1cs_ppzksnark_verifier_strong_IC<default_r1cs_ppzksnark_pp>(keypair.vk, pb.primary_input(), proof);
     
     cout << pb.is_satisfied() << endl;
-    cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << endl;
+    cout << "Number of R1CS constraints: " << pb.num_constraints() << endl;
     cout << "Primary (public) input: " << pb.primary_input() << endl;
     cout << "Auxiliary (private) input: " << pb.auxiliary_input() << endl;
-    cout << "Verification status: " << verified << endl;
+    //cout << "Verification status: " << verified << endl;
 }
 
 
