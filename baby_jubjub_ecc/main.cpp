@@ -533,12 +533,23 @@ void test_pedersen() {
 
     r.fill_with_bits(pb, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1});
 
-
+    
     jubjub_pedersen_commitment.reset(new pedersen_commitment<FieldT> (pb,a,d, base_x, base_y, h_x, h_y,commitment_x, commitment_y,m, r));
     jubjub_pedersen_commitment->generate_r1cs_constraints();
     jubjub_pedersen_commitment->generate_r1cs_witness();
-    assert(pb.is_satisfied());
+    const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
 
+    const r1cs_ppzksnark_keypair<default_r1cs_ppzksnark_pp> keypair = r1cs_ppzksnark_generator<default_r1cs_ppzksnark_pp>(constraint_system);
+
+    const r1cs_ppzksnark_proof<default_r1cs_ppzksnark_pp> proof = r1cs_ppzksnark_prover<default_r1cs_ppzksnark_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
+
+    bool verified = r1cs_ppzksnark_verifier_strong_IC<default_r1cs_ppzksnark_pp>(keypair.vk, pb.primary_input(), proof);
+    
+    cout << pb.is_satisfied() << endl;
+    cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << endl;
+    cout << "Primary (public) input: " << pb.primary_input() << endl;
+    cout << "Auxiliary (private) input: " << pb.auxiliary_input() << endl;
+    cout << "Verification status: " << verified << endl;
 }
 
 
@@ -547,13 +558,13 @@ void test_pedersen() {
 int main () {
     libff::alt_bn128_pp::init_public_params();
 
-    test_conditional_addition<libff::alt_bn128_pp>();
-    test_pointAddition<libff::alt_bn128_pp>();
-    test_pointMultiplication<libff::alt_bn128_pp>();
-    test_pointMultiplication2<libff::alt_bn128_pp>();
+    //test_conditional_addition<libff::alt_bn128_pp>();
+    //test_pointAddition<libff::alt_bn128_pp>();
+    //test_pointMultiplication<libff::alt_bn128_pp>();
+    //test_pointMultiplication2<libff::alt_bn128_pp>();
 
 
-    test_eddsa<libff::alt_bn128_pp, HashT>();
+    //test_eddsa<libff::alt_bn128_pp, HashT>();
     test_pedersen<libff::alt_bn128_pp>();
 
     return 0;
