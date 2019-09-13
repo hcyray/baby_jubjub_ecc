@@ -20,6 +20,7 @@
 
 
 #include "libff/algebra/curves/alt_bn128/alt_bn128_pp.hpp" //hold key
+#include "libsnark/common/default_types/r1cs_ppzksnark_pp.hpp"
 #include "baby_jubjub.hpp"
 #include "eddsa.hpp"
 #include "pedersen_commitment.hpp"
