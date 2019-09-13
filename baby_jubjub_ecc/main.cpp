@@ -474,6 +474,7 @@ void test_eddsa() {
 // test inputs taken from ../test/test_pedersen.py
 template<typename ppT>
 void test_pedersen() {
+    typedef libff::Fr<default_r1cs_ppzksnark_pp> FieldT;
     typedef libff::Fr<ppT> FieldT;
     protoboard<FieldT> pb;
     std::shared_ptr<pedersen_commitment<FieldT>> jubjub_pedersen_commitment;
