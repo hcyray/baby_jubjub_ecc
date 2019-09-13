@@ -549,8 +549,8 @@ void test_pedersen() {
     
     cout << pb.is_satisfied() << endl;
     cout << "Number of R1CS constraints: " << pb.num_constraints() << endl;
-    cout << "Primary (public) input: " << pb.primary_input() << endl;
-    cout << "Auxiliary (private) input: " << pb.auxiliary_input() << endl;
+    //cout << "Primary (public) input: " << pb.primary_input() << endl;
+    //cout << "Auxiliary (private) input: " << pb.auxiliary_input() << endl;
     //cout << "Verification status: " << verified << endl;
 }
 
