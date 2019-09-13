@@ -24,9 +24,10 @@
 #include "baby_jubjub.hpp"
 #include "eddsa.hpp"
 #include "pedersen_commitment.hpp"
+#include <iostream>
 
 
-
+using namespace std;
 using namespace libsnark;
 using namespace libff;
 typedef sha256_ethereum HashT;
