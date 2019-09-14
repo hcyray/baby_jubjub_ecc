@@ -540,7 +540,7 @@ void test_pedersen() {
     jubjub_pedersen_commitment->generate_r1cs_constraints();
     jubjub_pedersen_commitment->generate_r1cs_witness();
     //const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
-    const r1cs_ppzksnark_constraint_system<ppT> constraint_system = pb.get_constraint_system();
+    const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
     //const r1cs_ppzksnark_keypair<default_r1cs_ppzksnark_pp> keypair = r1cs_ppzksnark_generator<default_r1cs_ppzksnark_pp>(constraint_system);
     const r1cs_ppzksnark_keypair<ppT> keypair = r1cs_ppzksnark_generator<ppT>(constraint_system);
     
