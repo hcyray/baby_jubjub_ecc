@@ -25,6 +25,7 @@
 #include "eddsa.hpp"
 #include "pedersen_commitment.hpp"
 #include <iostream>
+#include <depends/libsnark/libsnark/zk_proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
 
 
 using namespace std;
@@ -540,21 +541,24 @@ void test_pedersen() {
     jubjub_pedersen_commitment->generate_r1cs_constraints();
     jubjub_pedersen_commitment->generate_r1cs_witness();
     //const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
-    //const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
+    const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
     //const r1cs_ppzksnark_keypair<default_r1cs_ppzksnark_pp> keypair = r1cs_ppzksnark_generator<default_r1cs_ppzksnark_pp>(constraint_system);
-    //const r1cs_ppzksnark_keypair<ppT> keypair = r1cs_ppzksnark_generator<ppT>(constraint_system);
+    const r1cs_ppzksnark_keypair<ppT> keypair = r1cs_ppzksnark_generator<ppT>(constraint_system);
     
     //const r1cs_ppzksnark_proof<default_r1cs_ppzksnark_pp> proof = r1cs_ppzksnark_prover<default_r1cs_ppzksnark_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
-    //const r1cs_ppzksnark_proof<ppT> proof = r1cs_ppzksnark_prover<ppT>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
+    const r1cs_ppzksnark_proof<ppT> proof = r1cs_ppzksnark_prover<ppT>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
 
     //bool verified = r1cs_ppzksnark_verifier_strong_IC<default_r1cs_ppzksnark_pp>(keypair.vk, pb.primary_input(), proof);
-    //bool verified = r1cs_ppzksnark_verifier_strong_IC<ppT>(keypair.vk, pb.primary_input(), proof);
-    
+    bool verified = r1cs_ppzksnark_verifier_strong_IC<ppT>(keypair.vk, pb.primary_input(), proof);
+    std::stringstream proof_data;
+    proof_data << proof;
+    auto proof_str = proof_data.str();
+    cout << proof_str.size() << endl;
     cout << pb.is_satisfied() << endl;
     cout << "Number of R1CS constraints: " << pb.num_constraints() << endl;
     //cout << "Primary (public) input: " << pb.primary_input() << endl;
     //cout << "Auxiliary (private) input: " << pb.auxiliary_input() << endl;
-    //cout << "Verification status: " << verified << endl;
+    cout << "Verification status: " << verified << endl;
 }
 
 
