@@ -33,14 +33,11 @@ template<typename FieldT>
 class  pedersen_commitment : public gadget<FieldT> {
 
 private:
-    /* no internal variables */
-public:
-
     pb_variable<FieldT> a;
     pb_variable<FieldT> d;
 
 
-    //input variables 
+    //input variables
     pb_variable<FieldT> base_x;
     pb_variable<FieldT> base_y;
     pb_variable_array<FieldT> A;
@@ -52,10 +49,9 @@ public:
     pb_variable<FieldT> r_y;
     pb_variable<FieldT> s_x;
     pb_variable<FieldT> s_y;
-    pb_variable<FieldT> commitment_x; 
-    pb_variable<FieldT> commitment_y;
 
-    //intermeidate variables 
+
+    //intermeidate variables
 
     pb_variable<FieldT> res_x;
     pb_variable<FieldT> res_y;
@@ -75,19 +71,21 @@ public:
     std::shared_ptr<pointAddition<FieldT>> jubjub_pointAddition;
     std::shared_ptr<pointMultiplication<FieldT>> jubjub_pointMultiplication_lhs;
     std::shared_ptr<pointMultiplication<FieldT>> jubjub_pointMultiplication_rhs;
+public:
 
+    pb_variable<FieldT> commitment_x;
+    pb_variable<FieldT> commitment_y;
 
      pedersen_commitment(protoboard<FieldT> &pb,
                    //const pb_linear_combination_array<FieldT> &bits,
-                   const pb_variable<FieldT> &a, const pb_variable<FieldT> &d,
-                   const pb_variable<FieldT> &base_x, const pb_variable<FieldT> &base_y,
-                   const pb_variable<FieldT> &H_x, const pb_variable<FieldT> &H_y,
                    const pb_variable<FieldT> &commitment_x, const pb_variable<FieldT> &commitment_y,
                    const pb_variable_array<FieldT> &m, const pb_variable_array<FieldT> &r
                    );
 
     void generate_r1cs_constraints();
     void generate_r1cs_witness();
+    pb_variable<FieldT> get_res_x();
+    pb_variable<FieldT> get_res_y();
 };
 
 }

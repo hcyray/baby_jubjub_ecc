@@ -10,6 +10,8 @@ add_library(
   baby_jubjub_ecc
   STATIC
 
+  prc.h
+  prc.tcc
   pedersen_commitment.hpp
 
   baby_jubjub.hpp
