@@ -1,4 +1,4 @@
-#include <prc.h>
+#include "prc.h"
 #include <fstream>
 #include "libff/algebra/curves/alt_bn128/alt_bn128_pp.hpp" //hold key
 #include "baby_jubjub.hpp"

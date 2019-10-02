@@ -5,14 +5,14 @@ add_executable(
 
   main.cpp
 
-  prc.tcc
+  prc.cpp
+
 )
 
 add_library(
   baby_jubjub_ecc
   STATIC
-  prc.tcc
-  prc.h
+
   pedersen_commitment.hpp
 
   baby_jubjub.hpp
