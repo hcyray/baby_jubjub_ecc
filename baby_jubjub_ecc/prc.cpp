@@ -161,29 +161,30 @@ void prc_prove_hpc_with_commit(void *output_proof_ptr, ulong m_ulong, ulong r_ul
 }
 
 template <typename ppT>
-void read_commit_value(char*& comm, libff::Fr<ppT> x){
+void read_commit_value(char *comm, int *len, libff::Fr<ppT> x){
     std::stringstream comm_data;
     comm_data << x;
     std::string comm_str = comm_data.str();
-    char* pTemp = new char[comm_str.size()+1];
-    for (int i = 0; i < comm_str.size()+1; i++) {
+    *len = comm_str.size() + 1;
+    char pTemp[*len];
+    for (int i = 0; i < *len; i++) {
         pTemp[i] = comm_str[i];
     }
-    comm = pTemp;
+    strcpy(comm, pTemp);
 
 }
 
-void prc_prove_hpc(void *output_proof_ptr, ulong m_ulong, ulong r_ulong, char* &comm_x, char* &comm_y){
+void prc_prove_hpc(void *output_proof_ptr, ulong m_ulong, ulong r_ulong, char* comm_x,int *len_x, char* comm_y, int *len_y){
     typedef libff::Fr<libff::alt_bn128_pp> FieldT;
 
     real_commit_value<libff::alt_bn128_pp> real_commit;
     prc_prove_hpc_with_commit<libff::alt_bn128_pp>(output_proof_ptr, m_ulong, r_ulong, false, real_commit);
-    read_commit_value<libff::alt_bn128_pp>(comm_x, real_commit.x);
-    read_commit_value<libff::alt_bn128_pp>(comm_y, real_commit.y);
+    read_commit_value<libff::alt_bn128_pp>(comm_x, len_x, real_commit.x);
+    read_commit_value<libff::alt_bn128_pp>(comm_y, len_y, real_commit.y);
     prc_prove_hpc_with_commit<libff::alt_bn128_pp>(output_proof_ptr, m_ulong, r_ulong, true, real_commit);
-
-    //cout << real_commit.x << endl;
-    //cout << real_commit.y << endl;
+    //cout << len_x << "    " << len_y<< endl;
+    //cout <<"real commit value x :" << real_commit.x << endl;
+    //cout <<"real commit value y :" <<real_commit.y << endl;
 }
 
 

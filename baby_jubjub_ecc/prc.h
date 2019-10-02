@@ -14,8 +14,10 @@ void prc_prove_hpc(
         void *output_proof_ptr,
         ulong m_ulong,
         ulong r_ulong,
-        char *&comm_x,
-        char *&comm_y
+        char *comm_x,
+        int *len_x,
+        char *comm_y,
+        int *len_y
 );
 
 bool prc_verify_hpc_with_commit(
