@@ -24,7 +24,7 @@
 using namespace libff;
 typedef bigint<alt_bn128_r_limbs> bigint_r;
 
-namespace libsnark {
+using namespace libsnark;
 
 
 template<typename FieldT>
@@ -351,4 +351,4 @@ void pointMultiplication<FieldT>::generate_r1cs_witness()
 
 
 
-} // libsnark
+

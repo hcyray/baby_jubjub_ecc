@@ -17,7 +17,6 @@ add_library(
 
   baby_jubjub.hpp
 
-  eddsa.hpp
 )
 
 target_link_libraries(

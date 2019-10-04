@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string.h>
+
 #include "prc.h"
 using namespace std;
 

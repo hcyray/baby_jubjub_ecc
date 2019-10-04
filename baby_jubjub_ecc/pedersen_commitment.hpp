@@ -27,7 +27,7 @@
 #define BABY_JUBJUB_CPP
 #endif
 
-namespace libsnark {
+using namespace libsnark;
 
 template<typename FieldT>
 class  pedersen_commitment : public gadget<FieldT> {
@@ -88,6 +88,5 @@ public:
     pb_variable<FieldT> get_res_y();
 };
 
-}
 #include <pedersen_commitment.cpp>
 

@@ -2,11 +2,10 @@
 #include <fstream>
 #include "libff/algebra/curves/alt_bn128/alt_bn128_pp.hpp" //hold key
 #include "baby_jubjub.hpp"
-#include "eddsa.hpp"
 #include "pedersen_commitment.hpp"
 #include <iostream>
 #include <string.h>
-#include <depends/libsnark/libsnark/zk_proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
+#include <libsnark/zk_proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
 using namespace std;
 using namespace libsnark;
 using namespace libff;
@@ -94,7 +93,7 @@ bool prc_verify_hpc_with_commit(void *proof_ptr, char *comm_x, char *comm_y) {
 
     r1cs_ppzksnark_verification_key<libff::alt_bn128_pp> verification_key;
     loadFromFile("hpc.vk", verification_key);
-
+    cout << "here" << endl;
     if (!r1cs_ppzksnark_verifier_strong_IC<libff::alt_bn128_pp>(verification_key, witness_map, proof_obj)) {
         return false;
     } else {
@@ -117,8 +116,8 @@ void prc_prove_hpc_with_commit(void *output_proof_ptr, ulong m_ulong, ulong r_ul
 
     commitment_x.allocate(pb, "r_x");
     commitment_y.allocate(pb, "r_y");
-    m.allocate(pb, 256, FMT("annotation_prefix", " scaler to multiply by"));
-    r.allocate(pb, 256, FMT("annotation_prefix", " scaler to multiply by"));
+    m.allocate(pb, 253, FMT("annotation_prefix", " scaler to multiply by"));
+    r.allocate(pb, 253, FMT("annotation_prefix", " scaler to multiply by"));
 
     pb.set_input_sizes(2);
 
@@ -146,7 +145,7 @@ void prc_prove_hpc_with_commit(void *output_proof_ptr, ulong m_ulong, ulong r_ul
         r1cs_ppzksnark_keypair<ppT> keypair = r1cs_ppzksnark_generator<ppT>(constraint_system);
 
 
-        saveToFile("hpc.pk", keypair.pk);
+        //saveToFile("hpc.pk", keypair.pk);
         saveToFile("hpc.vk", keypair.vk);
 
         r1cs_ppzksnark_proof<ppT> proof = r1cs_ppzksnark_prover<ppT>(keypair.pk, pb.primary_input(), pb.auxiliary_input());

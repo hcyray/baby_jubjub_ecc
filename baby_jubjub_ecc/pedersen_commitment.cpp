@@ -21,7 +21,7 @@
 using namespace libff;
 typedef bigint<alt_bn128_r_limbs> bigint_r;
 
-namespace libsnark {
+using namespace libsnark;
 
 
 template<typename FieldT>
@@ -124,4 +124,4 @@ void  pedersen_commitment<FieldT>::generate_r1cs_witness()
         return this->res_y;
 
     }
-}
+

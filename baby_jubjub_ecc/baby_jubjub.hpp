@@ -23,7 +23,7 @@
 
 #include <libsnark/gadgetlib1/gadget.hpp>
 
-namespace libsnark {
+using namespace libsnark;
 
 template<typename FieldT>
 class isOnCurve : public gadget<FieldT> {
@@ -188,5 +188,5 @@ public:
     void generate_r1cs_witness();
 };
 
-} // libsnark
+
 #include <baby_jubjub.cpp>
