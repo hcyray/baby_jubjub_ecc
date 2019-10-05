@@ -10,12 +10,6 @@ set(
   "Default curve: one of ALT_BN128, BN128, EDWARDS, MNT4, MNT6"
 )
 set(
-        USE_LINKED_LIBRARIES
-        "USE_LINKED_LIBRARIES"
-        ON
-)
-
-set(
   DEPENDS_DIR
   "${CMAKE_CURRENT_SOURCE_DIR}/depends"
   CACHE
