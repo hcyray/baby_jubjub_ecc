@@ -93,7 +93,6 @@ bool prc_verify_hpc_with_commit(void *proof_ptr, char *comm_x, char *comm_y) {
 
     r1cs_ppzksnark_verification_key<libff::alt_bn128_pp> verification_key;
     loadFromFile("hpc.vk", verification_key);
-    cout << "here" << endl;
     if (!r1cs_ppzksnark_verifier_strong_IC<libff::alt_bn128_pp>(verification_key, witness_map, proof_obj)) {
         return false;
     } else {
@@ -102,43 +101,40 @@ bool prc_verify_hpc_with_commit(void *proof_ptr, char *comm_x, char *comm_y) {
 }
 
 template<typename ppT>
-void prc_prove_hpc_with_commit(void *output_proof_ptr, ulong m_ulong, ulong r_ulong, bool get_commit, real_commit_value<ppT> &real_commit){
+void prc_prove_hpc_with_commit(unsigned char *output_proof, ulong m_ulong, ulong r_ulong, bool get_commit, real_commit_value<ppT> *real_commit){
     typedef libff::Fr<ppT> FieldT;
     protoboard<FieldT> pb;
     std::shared_ptr<pedersen_commitment<FieldT>> jubjub_pedersen_commitment;
-    unsigned char *output_proof = reinterpret_cast<unsigned char *>(output_proof_ptr);
+
 
     pb_variable<FieldT> commitment_x;
     pb_variable<FieldT> commitment_y;
     pb_variable_array<FieldT> m;
     pb_variable_array<FieldT> r;
-
+    pb_variable_array<FieldT> u;
 
     commitment_x.allocate(pb, "r_x");
     commitment_y.allocate(pb, "r_y");
     m.allocate(pb, 253, FMT("annotation_prefix", " scaler to multiply by"));
     r.allocate(pb, 253, FMT("annotation_prefix", " scaler to multiply by"));
-
     pb.set_input_sizes(2);
 
     if (!get_commit){
         pb.val(commitment_x) = FieldT("8010604480252997578874361183087746053332521656016812693508547791817401879458");
         pb.val(commitment_y) = FieldT("15523586168823793714775329447481371860621135473088351041443641753333446779329");
     } else {
-        pb.val(commitment_x) = real_commit.x;
-        pb.val(commitment_y) = real_commit.y;
+        pb.val(commitment_x) = real_commit->x;
+        pb.val(commitment_y) = real_commit->y;
     }
-
     m.fill_with_bits(pb, setbits(m_ulong));
     r.fill_with_bits(pb, setbits(r_ulong));
-
 
     jubjub_pedersen_commitment.reset(new pedersen_commitment<FieldT> (pb, commitment_x, commitment_y, m, r));
     jubjub_pedersen_commitment->generate_r1cs_constraints();
     jubjub_pedersen_commitment->generate_r1cs_witness();
     if (!get_commit){
-        real_commit.x = pb.val(jubjub_pedersen_commitment->get_res_x());
-        real_commit.y = pb.val(jubjub_pedersen_commitment->get_res_y());
+        real_commit->x = pb.val(jubjub_pedersen_commitment->get_res_x());
+        real_commit->y = pb.val(jubjub_pedersen_commitment->get_res_y());
     } else {
         r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
         r1cs_ppzksnark_proving_key<ppT> proving_key;
@@ -159,17 +155,21 @@ void prc_prove_hpc_with_commit(void *output_proof_ptr, ulong m_ulong, ulong r_ul
     }
 }
 
-template <typename ppT>
-void read_commit_value(char *comm, int *len, libff::Fr<ppT> x){
+
+const char* read_commit_value(int *len, libff::Fr<libff::alt_bn128_pp> x){
     std::stringstream comm_data;
     comm_data << x;
     std::string comm_str = comm_data.str();
-    *len = comm_str.size() + 1;
-    char pTemp[*len];
-    for (int i = 0; i < *len; i++) {
+    /*
+    char pTemp[comm_str.size() + 1];
+    for (int i = 0; i < comm_str.size() + 1; i++) {
         pTemp[i] = comm_str[i];
-    }
-    strcpy(comm, pTemp);
+    }*/
+    *len = comm_str.length();
+    const char * ret_str= (char*)malloc(*len);
+    memcpy((void*)ret_str, comm_str.c_str(), *len);
+
+    return ret_str;
 
 }
 
@@ -177,13 +177,22 @@ void prc_prove_hpc(void *output_proof_ptr, ulong m_ulong, ulong r_ulong, char* c
     typedef libff::Fr<libff::alt_bn128_pp> FieldT;
 
     real_commit_value<libff::alt_bn128_pp> real_commit;
-    prc_prove_hpc_with_commit<libff::alt_bn128_pp>(output_proof_ptr, m_ulong, r_ulong, false, real_commit);
-    read_commit_value<libff::alt_bn128_pp>(comm_x, len_x, real_commit.x);
-    read_commit_value<libff::alt_bn128_pp>(comm_y, len_y, real_commit.y);
-    prc_prove_hpc_with_commit<libff::alt_bn128_pp>(output_proof_ptr, m_ulong, r_ulong, true, real_commit);
-    //cout << len_x << "    " << len_y<< endl;
-    //cout <<"real commit value x :" << real_commit.x << endl;
-    //cout <<"real commit value y :" <<real_commit.y << endl;
+    unsigned char *output_proof = reinterpret_cast<unsigned char *>(output_proof_ptr);
+
+    prc_prove_hpc_with_commit<libff::alt_bn128_pp>(output_proof, m_ulong, r_ulong, false, &real_commit);
+
+    const char* constx = read_commit_value(len_x, real_commit.x);
+    const char* consty= read_commit_value(len_y, real_commit.y);
+    for (int i = 0; i < *len_x; i++) {
+        comm_x[i] = constx[i];
+    }
+    for (int i = 0; i < *len_y; i++) {
+        comm_y[i] = consty[i];
+    }
+    cout << *len_x<<endl;
+    cout << *len_y<<endl;
+    cout << "second commit" << endl;
+    prc_prove_hpc_with_commit<libff::alt_bn128_pp>(output_proof, m_ulong, r_ulong, true, &real_commit);
 }
 
 

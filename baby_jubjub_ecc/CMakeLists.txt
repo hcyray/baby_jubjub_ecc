@@ -5,14 +5,14 @@ add_executable(
 
   main.cpp
 
-  prc.cpp
+
 
 )
 
 add_library(
   baby_jubjub_ecc
   STATIC
-
+        prc.cpp
   pedersen_commitment.hpp
 
   baby_jubjub.hpp
@@ -47,4 +47,10 @@ target_include_directories(
   ${DEPENDS_DIR}/libsnark
   ${DEPENDS_DIR}/libsnark/depends/libff
   ${DEPENDS_DIR}/libsnark/depends/libfqfft
+)
+INSTALL(
+        TARGETS
+        baby_jubjub_ecc
+
+        DESTINATION lib
 )
