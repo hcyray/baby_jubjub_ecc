@@ -6,16 +6,17 @@ add_executable(
   main.cpp
 
 
-
-)
+        )
 
 add_library(
   baby_jubjub_ecc
   STATIC
-        prc.cpp
+        pedersen_hash.hpp
   pedersen_commitment.hpp
 
   baby_jubjub.hpp
+        utils.hpp
+        baby_jubjub_ecc.hpp
 
 )
 

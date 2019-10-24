@@ -20,7 +20,7 @@
 
 #include <cassert>
 #include <memory>
-
+#include <baby_jubjub.hpp>
 #include <libsnark/gadgetlib1/gadget.hpp>
 
 #ifndef BABY_JUBJUB_CPP
@@ -76,13 +76,13 @@ public:
     pb_variable<FieldT> commitment_x;
     pb_variable<FieldT> commitment_y;
 
-     pedersen_commitment(protoboard<FieldT> &pb,
+    pedersen_commitment(protoboard<FieldT> &pb,
                    //const pb_linear_combination_array<FieldT> &bits,
                    const pb_variable<FieldT> &commitment_x, const pb_variable<FieldT> &commitment_y,
                    const pb_variable_array<FieldT> &m, const pb_variable_array<FieldT> &r
                    );
 
-    void generate_r1cs_constraints();
+    void generate_r1cs_constraints(const bool commitment_check=true);
     void generate_r1cs_witness();
     pb_variable<FieldT> get_res_x();
     pb_variable<FieldT> get_res_y();

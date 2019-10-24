@@ -19,7 +19,6 @@
 
 #include "libff/algebra/curves/alt_bn128/alt_bn128_pp.hpp" //hold key
 using namespace libff;
-typedef bigint<alt_bn128_r_limbs> bigint_r;
 
 using namespace libsnark;
 
@@ -69,7 +68,7 @@ template<typename FieldT>
 
 
 template<typename FieldT>
-void  pedersen_commitment<FieldT>::generate_r1cs_constraints()
+void  pedersen_commitment<FieldT>::generate_r1cs_constraints(const bool commitment_check)
 {
     // not sure if we need to check pub key and r 
     // are on the curve. But doing it here for defense
@@ -80,11 +79,13 @@ void  pedersen_commitment<FieldT>::generate_r1cs_constraints()
     jubjub_pointMultiplication_lhs->generate_r1cs_constraints();
     jubjub_pointMultiplication_rhs->generate_r1cs_constraints();
     jubjub_pointAddition->generate_r1cs_constraints();
+    if (commitment_check){
+        this->pb.add_r1cs_constraint(r1cs_constraint<FieldT>({res_x} , {1}, {commitment_x}),
+                                     FMT("find y1*x2 == y1x2", " pedersen_commitment"));
+        this->pb.add_r1cs_constraint(r1cs_constraint<FieldT>({res_y} , {1}, {commitment_y}),
+                                     FMT("find y1*x2 == y1x2", " pedersen_commitment"));
+    }
 
-    this->pb.add_r1cs_constraint(r1cs_constraint<FieldT>({res_x} , {1}, {commitment_x}),
-                           FMT("find y1*x2 == y1x2", " pedersen_commitment"));
-    this->pb.add_r1cs_constraint(r1cs_constraint<FieldT>({res_y} , {1}, {commitment_y}),
-                           FMT("find y1*x2 == y1x2", " pedersen_commitment"));
 }
 
 
