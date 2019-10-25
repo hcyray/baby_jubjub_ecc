@@ -1,8 +1,9 @@
-#ifndef ETHSNARKS_MERKLE_TREE_HPP_
-#define ETHSNARKS_MERKLE_TREE_HPP_
+#ifndef BABY_JUBJUB_MERKLE_TREE_HPP_
+#define BABY_JUBJUB_MERKLE_TREE_HPP_
 
 #include "baby_jubjub_ecc.hpp"
-
+#include "pedersen_hash.hpp"
+#include <memory>
 
 /**
 * Depending on the address bit, output the correct left/right inputs
@@ -29,14 +30,17 @@
 * Each component is split into a & b sides, then added together
 * so the correct variable ends up in the right or left hand side.
 */
+using namespace libsnark;
+
+
 class merkle_path_selector : public GadgetT
 {
 public:
-    const VariableT m_input_x;
-    const VariableT m_input_y;
-    const VariableT m_pathvar_x;
-    const VariableT m_pathvar_y;
-    const VariableT m_is_right;
+    VariableT m_input_x;
+    VariableT m_input_y;
+    VariableT m_pathvar_x;
+    VariableT m_pathvar_y;
+    VariableT m_is_right;
 
     VariableT m_left_a_x;
     VariableT m_left_b_x;
@@ -75,149 +79,71 @@ public:
 };
 
 
-const VariableArrayT merkle_tree_IVs (ProtoboardT &in_pb);
 
 
-template<typename HashT>
+
+
 class markle_path_compute : public GadgetT
 {
-public:
-    const size_t m_depth;
-    const VariableArrayT m_address_bits;
-    const VariableT m_leaf_x;
-    const VariableT m_leaf_y;
-    const VariableArrayT m_path;
-
+private:
     std::vector<merkle_path_selector> m_selectors;
-    std::vector<HashT> m_hashers;
+    std::vector<std::shared_ptr <pedersen_hash<FieldT>>> m_hashers;
+public:
+    size_t m_depth;
+    VariableArrayT m_address_bits;
+    VariableT m_leaf_x;
+    VariableT m_leaf_y;
+    VariableArrayT m_path;
+
 
     markle_path_compute(
         ProtoboardT &in_pb,
-        const size_t in_depth,
+        const size_t &in_depth,
         const VariableArrayT& in_address_bits,
-        const VariableT in_leaf_x,
-        const VariableT in_leaf_y,
+        const VariableT& in_leaf_x,
+        const VariableT& in_leaf_y,
         const VariableArrayT& in_path,
         const std::string &in_annotation_prefix
-    ) :
-        GadgetT(in_pb, in_annotation_prefix),
-        m_depth(in_depth),
-        m_address_bits(in_address_bits),
-        m_leaf_x(in_leaf_x),
-        m_leaf_y(in_leaf_y),
-        m_path(in_path)
-    {
-        assert( in_depth > 0 );
-        assert( in_address_bits.size() == in_depth );
-        //assert( in_IVs.size() >= in_depth * 2 );
+    );
 
-        for( size_t i = 0; i < m_depth; i++ )
-        {
-            if( i == 0 )
-            {
-                m_selectors.push_back(
-                    merkle_path_selector(
-                        in_pb, in_leaf_x, in_leaf_y, in_path[0], in_path[1], in_address_bits[i],
-                        FMT(this->annotation_prefix, ".selector[%zu]", i)));
-            }
-            else {
-                m_selectors.push_back(
-                    merkle_path_selector(
-                        in_pb, m_hashers[i-1].get_res_x(), m_hashers[i-1].get_res_y(), in_path[i*2], in_path[i*2+1], in_address_bits[i],
-                        FMT(this->annotation_prefix, ".selector[%zu]", i)));
-            }
+    VariableT result_x();
 
-            auto t = HashT(
-                    in_pb, m_selectors[i].left_x(),m_selectors[i].left_y(), m_selectors[i].right_x(),m_selectors[i].right_y(),
-                    FMT(this->annotation_prefix, ".hasher[%zu]", i));
-            m_hashers.push_back(t);
-        }
-    }
+    VariableT result_y();
 
-    const VariableT result_x() const
-    {
-        assert( m_hashers.size() > 0 );
+    void generate_r1cs_constraints();
 
-        return m_hashers.back().get_res_x();
-    }
-
-    const VariableT result_y() const
-    {
-        assert( m_hashers.size() > 0 );
-
-        return m_hashers.back().get_res_y();
-    }
-
-
-    void generate_r1cs_constraints()
-    {
-        size_t i;
-        for( i = 0; i < m_hashers.size(); i++ )
-        {
-            m_selectors[i].generate_r1cs_constraints();
-            m_hashers[i].generate_r1cs_constraints();
-        }
-    }
-
-    void generate_r1cs_witness() const
-    {
-        size_t i;
-        for( i = 0; i < m_hashers.size(); i++ )
-        {
-            m_selectors[i].generate_r1cs_witness();
-            m_hashers[i].generate_r1cs_witness();
-        }
-    }
+    void generate_r1cs_witness();
 };
 
 
 /**
 * Merkle path authenticator, verifies computed root matches expected result
 */
-template<typename HashT>
-class merkle_path_authenticator : public markle_path_compute<HashT>
+
+class merkle_path_authenticator : public markle_path_compute
 {
 public:
-    const VariableT m_expected_root_x;
-    const VariableT m_expected_root_y;
+    VariableT m_expected_root_x;
+    VariableT m_expected_root_y;
     merkle_path_authenticator(
         ProtoboardT &in_pb,
-        const size_t in_depth,
-        const VariableArrayT in_address_bits,
-        const VariableT in_leaf_x,
-        const VariableT in_leaf_y,
-        const VariableT in_expected_root_x,
-        const VariableT in_expected_root_y,
-        const VariableArrayT in_path,
+        const size_t& in_depth,
+        const VariableArrayT &in_address_bits,
+        const VariableT &in_leaf_x,
+        const VariableT &in_leaf_y,
+        const VariableT &in_expected_root_x,
+        const VariableT &in_expected_root_y,
+        const VariableArrayT &in_path,
         const std::string &in_annotation_prefix
-    ) :
-        markle_path_compute<HashT>::markle_path_compute(in_pb, in_depth, in_address_bits, in_leaf_x, in_leaf_y, in_path, in_annotation_prefix),
-        m_expected_root_x(in_expected_root_x),
-        m_expected_root_y(in_expected_root_y)
-    { }
-    /*
-    bool is_valid() const
-    {
-        return this->pb.val(this->result()) == this->pb.val(m_expected_root);
-    }
-*/
-    void generate_r1cs_constraints()
-    {
-        markle_path_compute<HashT>::generate_r1cs_constraints();
+    );
 
-        // Ensure root matches calculated path hash
-        this->pb.add_r1cs_constraint(
-            ConstraintT(this->result_x(), 1, m_expected_root_x),
-            FMT(this->annotation_prefix, ".expected_root_x authenticator"));
-        this->pb.add_r1cs_constraint(
-                ConstraintT(this->result_y(), 1, m_expected_root_y),
-                FMT(this->annotation_prefix, ".expected_root_y authenticator"));
-    }
+    bool is_valid();
+
+    void generate_r1cs_constraints();
+    //void generate_r1cs_witness();
 };
 
 
 
-
-// ETHSNARKS_MERKLE_TREE_HPP_
+#include<merkle_tree.cpp>
 #endif
-#include <merkle_tree.cpp>

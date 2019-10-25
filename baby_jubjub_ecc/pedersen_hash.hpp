@@ -1,7 +1,8 @@
 //
 // Created by hcy_ray on 10/23/19.
 //
-
+#ifndef PEDSEN_HASH_HPP_
+#define PEDSEN_HASH_HPP_
 #include <cassert>
 #include <memory>
 #include "pedersen_commitment.hpp"
@@ -24,6 +25,8 @@ private:
     pb_variable<FieldT> right_y;
     pb_variable<FieldT> m_var;
     pb_variable<FieldT> r_var;
+    pb_variable<FieldT> a;
+    pb_variable<FieldT> d;
     std::shared_ptr<pedersen_commitment<FieldT>> commit;
     std::shared_ptr<pointAddition<FieldT>> hash_pointAddition;
     //pb_variable<FieldT> res_x;
@@ -36,7 +39,8 @@ public:
                   const pb_variable<FieldT> &left_x,
                   const pb_variable<FieldT> &left_y,
                   const pb_variable<FieldT> &right_x,
-                  const pb_variable<FieldT> &right_y
+                  const pb_variable<FieldT> &right_y,
+                  const std::string &annotation_prefix
     );
 
     void generate_r1cs_constraints();
@@ -50,3 +54,4 @@ public:
 
 
 #include "pedersen_hash.cpp"
+#endif

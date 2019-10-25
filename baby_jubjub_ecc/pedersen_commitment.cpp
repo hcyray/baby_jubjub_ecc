@@ -29,9 +29,9 @@ template<typename FieldT>
  pedersen_commitment<FieldT>:: pedersen_commitment(protoboard<FieldT> &pb,
                    //const pb_linear_combination_array<FieldT> &bits,
                    const pb_variable<FieldT> &commitment_x, const pb_variable<FieldT> &commitment_y,
-                   const pb_variable_array<FieldT> &m, const pb_variable_array<FieldT> &r
+                   const pb_variable_array<FieldT> &m, const pb_variable_array<FieldT> &r,const std::string &annotation_prefix
                    ):
-        gadget<FieldT>(pb, " pedersen_commitment") , commitment_x(commitment_x),commitment_y(commitment_y), m(m), r(r)
+        gadget<FieldT>(pb, annotation_prefix) , commitment_x(commitment_x),commitment_y(commitment_y), m(m), r(r)
 {
 
     base_x.allocate(pb, "base x");

@@ -2,21 +2,16 @@ include_directories(.)
 
 add_executable(
   main
-
   main.cpp
-
-
-        )
+)
 
 add_library(
-  baby_jubjub_ecc
-  STATIC
+        baby_jubjub_ecc
+        STATIC
+        merkle_tree.hpp
         pedersen_hash.hpp
-  pedersen_commitment.hpp
-
-  baby_jubjub.hpp
-        utils.hpp
-        baby_jubjub_ecc.hpp
+        pedersen_commitment.hpp
+        baby_jubjub.hpp
 
 )
 

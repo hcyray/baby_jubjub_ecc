@@ -11,16 +11,18 @@ using namespace libsnark;
 template<typename FieldT>
 pedersen_hash<FieldT>:: pedersen_hash(protoboard<FieldT> &pb,
         const pb_variable<FieldT> &left_x, const pb_variable<FieldT> &left_y,
-        const pb_variable<FieldT> &right_x, const pb_variable<FieldT> &right_y
+        const pb_variable<FieldT> &right_x, const pb_variable<FieldT> &right_y,const std::string &annotation_prefix
         ):
-        gadget<FieldT>(pb, " pedersen_hash") , left_x(left_x), left_y(left_y), right_x(right_x), right_y(right_y)
+        gadget<FieldT>(pb, annotation_prefix) , left_x(left_x), left_y(left_y), right_x(right_x), right_y(right_y)
 {
     m.allocate(pb, 253,  FMT("annotation_prefix", " scaler to multiply by"));
     r.allocate(pb, 253,  FMT("annotation_prefix", " scaler to multiply by"));
     m_var.allocate(pb, "m_var");
     r_var.allocate(pb, "r_var");
-    hash_pointAddition.reset( new pointAddition <FieldT> (pb, FieldT("168700"), FieldT("168696"), left_x, left_y , right_x , right_y, m_var, r_var , "rhs addition"));
-    commit.reset(new pedersen_commitment<FieldT>(pb, FieldT("0"), FieldT("0"), m, r));
+    a.allocate(pb, "hash_a");
+    d.allocate(pb, "hash_d");
+    hash_pointAddition.reset( new pointAddition <FieldT> (pb, a, d, left_x, left_y , right_x , right_y, m_var, r_var , "rhs addition"));
+    commit.reset(new pedersen_commitment<FieldT>(pb, a, d, m, r, FMT(annotation_prefix, "Pedersen Commitment")));
 }
 
 
@@ -36,6 +38,9 @@ void  pedersen_hash<FieldT>::generate_r1cs_constraints()
 template<typename FieldT>
 void  pedersen_hash<FieldT>::generate_r1cs_witness()
 {
+    this->pb.val(a) = FieldT("168700");
+    this->pb.val(d) = FieldT("168696");
+
     hash_pointAddition -> generate_r1cs_witness();
     FieldT temp_m = this->pb.val(m_var);
     FieldT temp_r = this->pb.val(r_var);
@@ -91,6 +96,22 @@ void  pedersen_hash<FieldT>::generate_r1cs_witness()
         i--;
     }
     commit -> generate_r1cs_witness();
+    /* Debug
+    std::cout << flagm << std::endl;
+    std::cout << flagr << std::endl;
+    std::cout << "m:";
+    for (int j =0; j <= 252; j++){
+        std::cout << this->pb.val(m[j]);
+    }
+    std::cout<< " "<< std::endl;
+    std::cout << "r:";
+    for (int j =0; j <= 252; j++){
+        std::cout <<this->pb.val(r[j]);
+    }
+    std::cout<< " "<< std::endl;
+
+    std::cout<< this->pb.val(commit->get_res_x())<< std::endl;
+    std::cout<< this->pb.val(commit->get_res_y())<< std::endl;*/
 }
 template<typename FieldT>
 pb_variable<FieldT>  pedersen_hash<FieldT>::get_res_x(){

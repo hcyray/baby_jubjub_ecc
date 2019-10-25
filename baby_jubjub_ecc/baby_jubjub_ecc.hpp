@@ -1,5 +1,5 @@
-#ifndef ETHSNARKS_HPP_
-#define ETHSNARKS_HPP_
+#ifndef BABY_JUBJUB_ECC_HPP_
+#define BABY_JUBJUB_ECC_HPP_
 
 #include <libff/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
 #include <libsnark/gadgetlib1/protoboard.hpp>
