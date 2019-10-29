@@ -33,20 +33,32 @@ private:
     //pb_variable<FieldT> res_y;
 public:
 
-
-    pedersen_hash(protoboard<FieldT> &pb,
-            //const pb_linear_combination_array<FieldT> &bits,
-                  const pb_variable<FieldT> &left_x,
-                  const pb_variable<FieldT> &left_y,
-                  const pb_variable<FieldT> &right_x,
-                  const pb_variable<FieldT> &right_y,
-                  const std::string &annotation_prefix
-    );
+    pedersen_hash(protoboard<FieldT> &pb, const std::string &annotation_prefix);
 
     void generate_r1cs_constraints();
-    void generate_r1cs_witness();
+    void generate_r1cs_witness(
+            const pb_variable<FieldT> &left_x,
+            const pb_variable<FieldT> &left_y,
+            const pb_variable<FieldT> &right_x,
+            const pb_variable<FieldT> &right_y
+            );
     pb_variable<FieldT> get_res_x();
     pb_variable<FieldT> get_res_y();
+
+    static size_t verifying_field_element_size() {
+        return libff::div_ceil(verifying_input_bit_size(), FieldT::capacity());
+    }
+
+    static size_t verifying_input_bit_size() {
+        size_t acc = 0;
+
+        acc += 1; // left x
+        acc += 1; // left y
+        acc += 1; // right x
+        acc += 1; // right y
+
+        return acc;
+    }
 };
 
 

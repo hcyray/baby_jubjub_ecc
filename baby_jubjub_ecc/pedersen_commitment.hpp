@@ -76,16 +76,25 @@ public:
     pb_variable<FieldT> commitment_x;
     pb_variable<FieldT> commitment_y;
 
-    pedersen_commitment(protoboard<FieldT> &pb,
-                   //const pb_linear_combination_array<FieldT> &bits,
-                   const pb_variable<FieldT> &commitment_x, const pb_variable<FieldT> &commitment_y,
-                   const pb_variable_array<FieldT> &m, const pb_variable_array<FieldT> &r, const std::string &annotation_prefix
-                   );
+    pedersen_commitment(protoboard<FieldT> &pb, const std::string &annotation_prefix);
 
     void generate_r1cs_constraints(const bool commitment_check=true);
-    void generate_r1cs_witness();
+    void generate_r1cs_witness(const pb_variable<FieldT> &commitment_x, const pb_variable<FieldT> &commitment_y,
+                               const pb_variable_array<FieldT> &m, const pb_variable_array<FieldT> &r);
     pb_variable<FieldT> get_res_x();
     pb_variable<FieldT> get_res_y();
+
+    static size_t verifying_field_element_size() {
+        return libff::div_ceil(verifying_input_bit_size(), FieldT::capacity());
+    }
+
+    static size_t verifying_input_bit_size() {
+        size_t acc = 0;
+        acc += 1; // commitment x
+        acc += 1; // commitment y
+        return acc;
+    }
+
 };
 
 #include <pedersen_commitment.cpp>

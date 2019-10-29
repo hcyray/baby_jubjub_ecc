@@ -9,20 +9,22 @@ using namespace libff;
 using namespace libsnark;
 
 template<typename FieldT>
-pedersen_hash<FieldT>:: pedersen_hash(protoboard<FieldT> &pb,
-        const pb_variable<FieldT> &left_x, const pb_variable<FieldT> &left_y,
-        const pb_variable<FieldT> &right_x, const pb_variable<FieldT> &right_y,const std::string &annotation_prefix
-        ):
-        gadget<FieldT>(pb, annotation_prefix) , left_x(left_x), left_y(left_y), right_x(right_x), right_y(right_y)
+pedersen_hash<FieldT>:: pedersen_hash(protoboard<FieldT> &pb,const std::string &annotation_prefix):
+        gadget<FieldT>(pb, annotation_prefix)
 {
-    m.allocate(pb, 253,  FMT("annotation_prefix", " scaler to multiply by"));
-    r.allocate(pb, 253,  FMT("annotation_prefix", " scaler to multiply by"));
+    pb.set_input_sizes(verifying_field_element_size());
+    left_x.allocate(pb,  FMT(annotation_prefix, " left x"));
+    left_y.allocate(pb, FMT(annotation_prefix, " left y"));
+    right_x.allocate(pb,  FMT(annotation_prefix, " right x"));
+    right_y.allocate(pb,  FMT(annotation_prefix, " right y"));
+    m.allocate(pb, 253,  FMT(annotation_prefix, " scaler to multiply by"));
+    r.allocate(pb, 253,  FMT(annotation_prefix, " scaler to multiply by"));
     m_var.allocate(pb, "m_var");
     r_var.allocate(pb, "r_var");
     a.allocate(pb, "hash_a");
     d.allocate(pb, "hash_d");
     hash_pointAddition.reset( new pointAddition <FieldT> (pb, a, d, left_x, left_y , right_x , right_y, m_var, r_var , "rhs addition"));
-    commit.reset(new pedersen_commitment<FieldT>(pb, a, d, m, r, FMT(annotation_prefix, "Pedersen Commitment")));
+    commit.reset(new pedersen_commitment<FieldT>(pb, FMT(annotation_prefix, "Pedersen Commitment")));
 }
 
 
@@ -36,11 +38,16 @@ void  pedersen_hash<FieldT>::generate_r1cs_constraints()
 
 
 template<typename FieldT>
-void  pedersen_hash<FieldT>::generate_r1cs_witness()
+void  pedersen_hash<FieldT>::generate_r1cs_witness(
+        const pb_variable<FieldT> &left_x, const pb_variable<FieldT> &left_y,
+        const pb_variable<FieldT> &right_x, const pb_variable<FieldT> &right_y)
 {
     this->pb.val(a) = FieldT("168700");
     this->pb.val(d) = FieldT("168696");
-
+    this->pb.val(this->left_x) = this->pb.val(left_x);
+    this->pb.val(this->left_y) = this->pb.val(left_y);
+    this->pb.val(this->right_x) = this->pb.val(right_x);
+    this->pb.val(this->right_y) = this->pb.val(right_y);
     hash_pointAddition -> generate_r1cs_witness();
     FieldT temp_m = this->pb.val(m_var);
     FieldT temp_r = this->pb.val(r_var);
@@ -95,7 +102,7 @@ void  pedersen_hash<FieldT>::generate_r1cs_witness()
         }
         i--;
     }
-    commit -> generate_r1cs_witness();
+    commit -> generate_r1cs_witness(a, d, m, r);
     /* Debug
     std::cout << flagm << std::endl;
     std::cout << flagr << std::endl;

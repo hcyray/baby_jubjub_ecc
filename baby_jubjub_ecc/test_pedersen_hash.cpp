@@ -25,10 +25,10 @@ int main () {
     pb.val(commitment_x) = FieldT("17777552123799933955779906779655732241715742912184938656739573121738514868268");
     pb.val(commitment_y) = FieldT("2626589144620713026669568689430873010625803728049924121243784502389097019475");
     pb.val(m) = FieldT("1");
-    pb.val(r) = FieldT("0");
-    jubjub_pedersen_hash.reset(new pedersen_hash<FieldT> (pb, commitment_x, commitment_y, m, r, "Pedersen Hash"));
+    pb.val(r) = FieldT("1");
+    jubjub_pedersen_hash.reset(new pedersen_hash<FieldT> (pb,  "Pedersen Hash"));
     jubjub_pedersen_hash->generate_r1cs_constraints();
-    jubjub_pedersen_hash->generate_r1cs_witness();
+    jubjub_pedersen_hash->generate_r1cs_witness(commitment_x, commitment_y, m, r);
 
     r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
     r1cs_ppzksnark_keypair<libff::alt_bn128_pp> keypair = r1cs_ppzksnark_generator<libff::alt_bn128_pp>(constraint_system);

@@ -81,6 +81,7 @@ bool prc_verify_hpc_with_commit(void *proof_ptr, char *comm_x, char *comm_y) {
     proof_data.rdbuf()->pubseekpos(0, std::ios_base::in);
     r1cs_ppzksnark_proof<libff::alt_bn128_pp> proof_obj;
     proof_data >> proof_obj;
+
     // Add commitment value
     r1cs_primary_input<FieldT> witness_map;
     witness_map.insert(witness_map.end(), FieldT(comm_x));

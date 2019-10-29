@@ -36,15 +36,15 @@ int main () {
 
     size_t tree_depth = 2;
     merkle_path_authenticator auth(
-            pb, tree_depth, address_bits, leaf_x, leaf_y,
-            expected_root_x, expected_root_y, path,
+            pb, tree_depth,
             "authenticator");
 
 
     auth.generate_r1cs_constraints();
-    auth.generate_r1cs_witness();
-    if(  !auth.is_valid() ) {
-        cout << "No!" << endl;
+    auth.generate_r1cs_witness(address_bits, leaf_x, leaf_y,
+                               expected_root_x, expected_root_y, path);
+    if(  auth.is_valid() ) {
+        cout << "Yes!" << endl;
         cout << "Acutal X:" << pb.val(auth.result_x()) << endl;
         cout << "Acutal Y:" << pb.val(auth.result_y()) << endl;
         cout << "Expect X:" << pb.val(auth.m_expected_root_x) << endl;

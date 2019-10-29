@@ -99,10 +99,6 @@ public:
     markle_path_compute(
         ProtoboardT &in_pb,
         const size_t &in_depth,
-        const VariableArrayT& in_address_bits,
-        const VariableT& in_leaf_x,
-        const VariableT& in_leaf_y,
-        const VariableArrayT& in_path,
         const std::string &in_annotation_prefix
     );
 
@@ -112,7 +108,12 @@ public:
 
     void generate_r1cs_constraints();
 
-    void generate_r1cs_witness();
+    void generate_r1cs_witness(
+            const VariableArrayT& in_address_bits,
+            const VariableT& in_leaf_x,
+            const VariableT& in_leaf_y,
+            const VariableArrayT& in_path
+            );
 };
 
 
@@ -128,19 +129,20 @@ public:
     merkle_path_authenticator(
         ProtoboardT &in_pb,
         const size_t& in_depth,
-        const VariableArrayT &in_address_bits,
-        const VariableT &in_leaf_x,
-        const VariableT &in_leaf_y,
-        const VariableT &in_expected_root_x,
-        const VariableT &in_expected_root_y,
-        const VariableArrayT &in_path,
         const std::string &in_annotation_prefix
     );
 
     bool is_valid();
 
     void generate_r1cs_constraints();
-    //void generate_r1cs_witness();
+    void generate_r1cs_witness(
+            const VariableArrayT &in_address_bits,
+            const VariableT &in_leaf_x,
+            const VariableT &in_leaf_y,
+            const VariableT &in_expected_root_x,
+            const VariableT &in_expected_root_y,
+            const VariableArrayT &in_path
+            );
 };
 
 

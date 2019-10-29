@@ -121,39 +121,33 @@ const VariableT& merkle_path_selector::right_y() const {
 markle_path_compute:: markle_path_compute(
             ProtoboardT &in_pb,
             const size_t& in_depth,
-            const VariableArrayT& in_address_bits,
-            const VariableT& in_leaf_x,
-            const VariableT& in_leaf_y,
-            const VariableArrayT& in_path,
             const std::string &in_annotation_prefix
     ) :
             GadgetT(in_pb, in_annotation_prefix),
-            m_depth(in_depth),
-            m_address_bits(in_address_bits),
-            m_leaf_x(in_leaf_x),
-            m_leaf_y(in_leaf_y),
-            m_path(in_path)
+            m_depth(in_depth)
     {
         assert( in_depth > 0 );
         assert( in_address_bits.size() == in_depth );
         //assert( in_IVs.size() >= in_depth * 2 );
-
+        m_address_bits.allocate(pb, m_depth, FMT(annotation_prefix, "address_bit"));
+        m_leaf_x.allocate(pb, FMT(annotation_prefix, "leaf_x"));
+        m_leaf_y.allocate(pb, FMT(annotation_prefix, "leaf_x"));
+        m_path.allocate(pb, m_depth*2, FMT(annotation_prefix, "path"));
         for( size_t i = 0; i < m_depth; i++ )
         {
             if( i == 0 )
             {
                 m_selectors.emplace_back(
-                                in_pb, in_leaf_x, in_leaf_y, in_path[0], in_path[1], in_address_bits[i],
+                                in_pb, m_leaf_x, m_leaf_y, m_path[0], m_path[1], m_address_bits[i],
                                 FMT(this->annotation_prefix, ".selector[%zu]", i));
             }
             else {
                 m_selectors.emplace_back(
-                                in_pb, m_hashers[i-1]->get_res_x(), m_hashers[i-1]->get_res_y(), in_path[i*2], in_path[i*2+1], in_address_bits[i],
+                                in_pb, m_hashers[i-1]->get_res_x(), m_hashers[i-1]->get_res_y(), m_path[i*2], m_path[i*2+1], m_address_bits[i],
                                 FMT(this->annotation_prefix, ".selector[%zu]", i));
             }
 
-            m_hashers.emplace_back(new pedersen_hash<FieldT>(in_pb, m_selectors[i].left_x(),m_selectors[i].left_y(),
-                                             m_selectors[i].right_x(),m_selectors[i].right_y(), FMT(this->annotation_prefix, ".hasher[%zu]", i)));
+            m_hashers.emplace_back(new pedersen_hash<FieldT>(in_pb,  FMT(this->annotation_prefix, ".hasher[%zu]", i)));
         }
     }
 
@@ -181,13 +175,23 @@ void markle_path_compute::generate_r1cs_constraints()
     }
 }
 
-void markle_path_compute::generate_r1cs_witness()
+void markle_path_compute::generate_r1cs_witness(
+        const VariableArrayT& in_address_bits,
+        const VariableT& in_leaf_x,
+        const VariableT& in_leaf_y,
+        const VariableArrayT& in_path
+        )
 {
+    m_address_bits.fill_with_field_elements(pb, in_address_bits.get_vals(pb));
+    pb.val(m_leaf_x) = pb.val(in_leaf_x);
+    pb.val(m_leaf_y) = pb.val(in_leaf_y);
+    m_path.fill_with_field_elements(pb, in_path.get_vals(pb));
     size_t i;
     for( i = 0; i < m_hashers.size(); i++ )
     {
         m_selectors[i].generate_r1cs_witness();
-        m_hashers[i]->generate_r1cs_witness();
+        m_hashers[i]->generate_r1cs_witness(m_selectors[i].left_x(),m_selectors[i].left_y(),
+                                            m_selectors[i].right_x(),m_selectors[i].right_y());
     }
 
 //    Debug
@@ -216,18 +220,13 @@ void markle_path_compute::generate_r1cs_witness()
 merkle_path_authenticator::merkle_path_authenticator(
             ProtoboardT &in_pb,
             const size_t& in_depth,
-            const VariableArrayT& in_address_bits,
-            const VariableT& in_leaf_x,
-            const VariableT& in_leaf_y,
-            const VariableT& in_expected_root_x,
-            const VariableT& in_expected_root_y,
-            const VariableArrayT& in_path,
             const std::string &in_annotation_prefix
     ) :
-            markle_path_compute::markle_path_compute(in_pb, in_depth, in_address_bits, in_leaf_x, in_leaf_y, in_path, in_annotation_prefix),
-            m_expected_root_x(in_expected_root_x),
-            m_expected_root_y(in_expected_root_y)
-    { }
+            markle_path_compute::markle_path_compute(in_pb, in_depth, in_annotation_prefix)
+    {
+        m_expected_root_x.allocate(pb,FMT(in_annotation_prefix, "expected root x"));
+        m_expected_root_y.allocate(pb,FMT(in_annotation_prefix, "expected root y"));
+    }
 
 bool merkle_path_authenticator::is_valid()
 {
@@ -250,5 +249,14 @@ void merkle_path_authenticator::generate_r1cs_constraints()
     this->pb.add_r1cs_constraint(
             ConstraintT(this->result_y(), 1, m_expected_root_y),
             FMT(this->annotation_prefix, ".expected_root_y authenticator"));
+}
+
+void merkle_path_authenticator::generate_r1cs_witness(
+        const VariableArrayT &in_address_bits, const VariableT &in_leaf_x, const VariableT &in_leaf_y,
+        const VariableT &in_expected_root_x, const VariableT &in_expected_root_y, const VariableArrayT &in_path)
+{
+    markle_path_compute::generate_r1cs_witness(in_address_bits, in_leaf_x, in_leaf_y, in_path);
+    pb.val(m_expected_root_x) = pb.val(in_expected_root_x);
+    pb.val(m_expected_root_y) = pb.val(in_expected_root_y);
 }
 
