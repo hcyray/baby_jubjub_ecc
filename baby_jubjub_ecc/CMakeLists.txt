@@ -12,7 +12,6 @@ add_library(
         pedersen_hash.hpp
         pedersen_commitment.hpp
         baby_jubjub.hpp
-
 )
 
 target_link_libraries(

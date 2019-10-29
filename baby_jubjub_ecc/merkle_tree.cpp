@@ -224,6 +224,7 @@ merkle_path_authenticator::merkle_path_authenticator(
     ) :
             markle_path_compute::markle_path_compute(in_pb, in_depth, in_annotation_prefix)
     {
+        pb.set_input_sizes(verifying_field_element_size());
         m_expected_root_x.allocate(pb,FMT(in_annotation_prefix, "expected root x"));
         m_expected_root_y.allocate(pb,FMT(in_annotation_prefix, "expected root y"));
     }

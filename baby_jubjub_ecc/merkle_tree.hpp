@@ -143,6 +143,16 @@ public:
             const VariableT &in_expected_root_y,
             const VariableArrayT &in_path
             );
+    static size_t verifying_field_element_size() {
+        return libff::div_ceil(verifying_input_bit_size(), FieldT::capacity());
+    }
+
+    static size_t verifying_input_bit_size() {
+        size_t acc = 0;
+        acc += 1; // expected root commitment x
+        acc += 1; // expected root commitment y
+        return acc;
+    }
 };
 
 

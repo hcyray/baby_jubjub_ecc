@@ -1,5 +1,5 @@
 #include <iostream>
-//#include "stubs.hpp"
+#include <libsnark/zk_proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
 #include "merkle_tree.hpp"
 #include "pedersen_hash.hpp"
 using namespace std;
@@ -56,5 +56,17 @@ int main () {
     } else {
         cout << "True" << endl;
     }
+    r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
+    r1cs_ppzksnark_keypair<libff::alt_bn128_pp> keypair = r1cs_ppzksnark_generator<libff::alt_bn128_pp>(constraint_system);
+    r1cs_ppzksnark_proof<libff::alt_bn128_pp> proof = r1cs_ppzksnark_prover<libff::alt_bn128_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
+
+    bool result = r1cs_ppzksnark_verifier_strong_IC<libff::alt_bn128_pp>(keypair.vk, pb.primary_input(), proof);
+    cout << "verification result:" << result <<endl;
+    std::stringstream proof_data;
+    proof_data << proof;
+    auto proof_str = proof_data.str();
+
+    cout << "proof size :" << proof_str.size() << endl;
+
 }
 
