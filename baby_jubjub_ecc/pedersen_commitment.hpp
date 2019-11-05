@@ -45,10 +45,7 @@ private:
     pb_variable<FieldT> H_y;
     pb_variable_array<FieldT> m;
     pb_variable_array<FieldT> r;
-    pb_variable<FieldT> r_x;
-    pb_variable<FieldT> r_y;
-    pb_variable<FieldT> s_x;
-    pb_variable<FieldT> s_y;
+
 
 
     //intermeidate variables
