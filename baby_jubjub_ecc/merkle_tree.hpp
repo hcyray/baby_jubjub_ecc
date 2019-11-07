@@ -31,7 +31,7 @@
 * so the correct variable ends up in the right or left hand side.
 */
 using namespace libsnark;
-
+using namespace std;
 
 class merkle_path_selector : public GadgetT
 {
@@ -89,6 +89,8 @@ private:
     std::vector<merkle_path_selector> m_selectors;
     std::vector<std::shared_ptr <pedersen_hash<FieldT>>> m_hashers;
 public:
+    VariableT m_expected_root_x;
+    VariableT m_expected_root_y;
     size_t m_depth;
     VariableArrayT m_address_bits;
     VariableT m_leaf_x;
@@ -114,6 +116,16 @@ public:
             const VariableT& in_leaf_y,
             const VariableArrayT& in_path
             );
+    static size_t verifying_field_element_size() {
+        return libff::div_ceil(verifying_input_bit_size(), FieldT::capacity());
+    }
+
+    static size_t verifying_input_bit_size() {
+        size_t acc = 0;
+        acc += 253; // expected root commitment x
+        acc += 253; // expected root commitment y
+        return acc;
+    }
 };
 
 
@@ -124,8 +136,7 @@ public:
 class merkle_path_authenticator : public markle_path_compute
 {
 public:
-    VariableT m_expected_root_x;
-    VariableT m_expected_root_y;
+
     merkle_path_authenticator(
         ProtoboardT &in_pb,
         const size_t& in_depth,
@@ -136,23 +147,14 @@ public:
 
     void generate_r1cs_constraints();
     void generate_r1cs_witness(
-            const VariableArrayT &in_address_bits,
-            const VariableT &in_leaf_x,
-            const VariableT &in_leaf_y,
-            const VariableT &in_expected_root_x,
-            const VariableT &in_expected_root_y,
-            const VariableArrayT &in_path
+            const vector<FieldT> &in_address_bits,
+            const FieldT &in_leaf_x,
+            const FieldT &in_leaf_y,
+            const FieldT &in_expected_root_x,
+            const FieldT &in_expected_root_y,
+            const vector<FieldT> &in_path
             );
-    static size_t verifying_field_element_size() {
-        return libff::div_ceil(verifying_input_bit_size(), FieldT::capacity());
-    }
 
-    static size_t verifying_input_bit_size() {
-        size_t acc = 0;
-        acc += 1; // expected root commitment x
-        acc += 1; // expected root commitment y
-        return acc;
-    }
 };
 
 

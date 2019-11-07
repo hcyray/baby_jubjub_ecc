@@ -9,14 +9,20 @@ using namespace libff;
 using namespace libsnark;
 
 template<typename FieldT>
-pedersen_hash<FieldT>:: pedersen_hash(protoboard<FieldT> &pb,const std::string &annotation_prefix):
+pedersen_hash<FieldT>:: pedersen_hash(protoboard<FieldT> &pb,const std::string &annotation_prefix, const bool &outlayer):
         gadget<FieldT>(pb, annotation_prefix)
 {
-    pb.set_input_sizes(verifying_field_element_size());
+
     left_x.allocate(pb,  FMT(annotation_prefix, " left x"));
     left_y.allocate(pb, FMT(annotation_prefix, " left y"));
     right_x.allocate(pb,  FMT(annotation_prefix, " right x"));
     right_y.allocate(pb,  FMT(annotation_prefix, " right y"));
+    if (outlayer){
+        pb.set_input_sizes(verifying_field_element_size());
+    }
+
+
+
     m.allocate(pb, 253,  FMT(annotation_prefix, " scaler to multiply by"));
     r.allocate(pb, 253,  FMT(annotation_prefix, " scaler to multiply by"));
     m_var.allocate(pb, "m_var");
@@ -51,7 +57,10 @@ void  pedersen_hash<FieldT>::generate_r1cs_witness(
     hash_pointAddition -> generate_r1cs_witness();
     FieldT temp_m = this->pb.val(m_var);
     FieldT temp_r = this->pb.val(r_var);
-
+    fill_with_bits_of_field_element_baby_jubjub(this->pb, m,this->pb.val(m_var));
+    fill_with_bits_of_field_element_baby_jubjub(this->pb, r,this->pb.val(r_var));
+    commit -> generate_r1cs_witness(a, d, m, r);
+    /*
     std::stringstream comm_data_m, comm_data_r;
     comm_data_m << temp_m;
     std::string comm_str_m = comm_data_m.str();
@@ -102,7 +111,8 @@ void  pedersen_hash<FieldT>::generate_r1cs_witness(
         }
         i--;
     }
-    commit -> generate_r1cs_witness(a, d, m, r);
+    */
+
     /* Debug
     std::cout << flagm << std::endl;
     std::cout << flagr << std::endl;
@@ -131,3 +141,21 @@ pb_variable<FieldT>  pedersen_hash<FieldT>::get_res_y(){
 
 }
 
+
+
+template<typename FieldT>
+out_pedersen_hash<FieldT>::out_pedersen_hash(
+        protoboard<FieldT> &in_pb,
+        const std::string &in_annotation_prefix
+): pedersen_hash<FieldT>::pedersen_hash(in_pb, in_annotation_prefix, true){
+}
+
+template<typename FieldT>
+void out_pedersen_hash<FieldT>::generate_r1cs_witness(const FieldT &left_x, const FieldT &left_y, const FieldT &right_x,
+                                              const FieldT &right_y) {
+    this->pb.val(this->left_x) = left_x;
+    this->pb.val(this->left_y) = left_y;
+    this->pb.val(this->right_x) = right_y;
+    this->pb.val(this->right_y) = right_y;
+    pedersen_hash<FieldT>::generate_r1cs_witness(this->left_x, this->left_y, this-> right_x, this->right_y);
+}

@@ -128,6 +128,9 @@ markle_path_compute:: markle_path_compute(
     {
         assert( in_depth > 0 );
         assert( in_address_bits.size() == in_depth );
+        m_expected_root_x.allocate(pb,FMT(in_annotation_prefix, "expected root x"));
+        m_expected_root_y.allocate(pb,FMT(in_annotation_prefix, "expected root y"));
+        pb.set_input_sizes(verifying_field_element_size());
         //assert( in_IVs.size() >= in_depth * 2 );
         m_address_bits.allocate(pb, m_depth, FMT(annotation_prefix, "address_bit"));
         m_leaf_x.allocate(pb, FMT(annotation_prefix, "leaf_x"));
@@ -147,7 +150,7 @@ markle_path_compute:: markle_path_compute(
                                 FMT(this->annotation_prefix, ".selector[%zu]", i));
             }
 
-            m_hashers.emplace_back(new pedersen_hash<FieldT>(in_pb,  FMT(this->annotation_prefix, ".hasher[%zu]", i)));
+            m_hashers.emplace_back(new pedersen_hash<FieldT>(in_pb,  FMT(this->annotation_prefix, ".hasher[%zu]", i),false));
         }
     }
 
@@ -223,11 +226,7 @@ merkle_path_authenticator::merkle_path_authenticator(
             const std::string &in_annotation_prefix
     ) :
             markle_path_compute::markle_path_compute(in_pb, in_depth, in_annotation_prefix)
-    {
-        pb.set_input_sizes(verifying_field_element_size());
-        m_expected_root_x.allocate(pb,FMT(in_annotation_prefix, "expected root x"));
-        m_expected_root_y.allocate(pb,FMT(in_annotation_prefix, "expected root y"));
-    }
+    {}
 
 bool merkle_path_authenticator::is_valid()
 {
@@ -253,11 +252,15 @@ void merkle_path_authenticator::generate_r1cs_constraints()
 }
 
 void merkle_path_authenticator::generate_r1cs_witness(
-        const VariableArrayT &in_address_bits, const VariableT &in_leaf_x, const VariableT &in_leaf_y,
-        const VariableT &in_expected_root_x, const VariableT &in_expected_root_y, const VariableArrayT &in_path)
+        const vector<FieldT> &in_address_bits, const FieldT &in_leaf_x, const FieldT &in_leaf_y,
+        const FieldT &in_expected_root_x, const FieldT &in_expected_root_y, const vector<FieldT> &in_path)
 {
-    markle_path_compute::generate_r1cs_witness(in_address_bits, in_leaf_x, in_leaf_y, in_path);
-    pb.val(m_expected_root_x) = pb.val(in_expected_root_x);
-    pb.val(m_expected_root_y) = pb.val(in_expected_root_y);
+    this->m_address_bits.fill_with_field_elements(this->pb, in_address_bits);
+    this->m_path.fill_with_field_elements(this->pb, in_path);
+    this->pb.val(this->m_leaf_x) = in_leaf_x;
+    this->pb.val(this->m_leaf_y) = in_leaf_y;
+    markle_path_compute::generate_r1cs_witness(this->m_address_bits, this->m_leaf_x, this->m_leaf_y, this->m_path);
+    pb.val(this->m_expected_root_x) = in_expected_root_x;
+    pb.val(this->m_expected_root_y) = in_expected_root_y;
 }
 

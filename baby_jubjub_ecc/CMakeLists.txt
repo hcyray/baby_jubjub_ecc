@@ -2,13 +2,14 @@ include_directories(.)
 
 add_executable(
   main
-  test_leader_proof.cpp
+        main.cpp
 )
 
 add_library(
         baby_jubjub_ecc
         STATIC
-        leader_proof.hpp
+        prc.cpp
+        leader_proof.cpp
         merkle_tree.hpp
         pedersen_hash.hpp
         pedersen_commitment.hpp

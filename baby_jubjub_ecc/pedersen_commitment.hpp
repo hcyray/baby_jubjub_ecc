@@ -73,7 +73,7 @@ public:
     pb_variable<FieldT> commitment_x;
     pb_variable<FieldT> commitment_y;
 
-    pedersen_commitment(protoboard<FieldT> &pb, const std::string &annotation_prefix);
+    pedersen_commitment(protoboard<FieldT> &pb, const std::string &annotation_prefix, const bool &outlayer=false);
 
     void generate_r1cs_constraints(const bool commitment_check=true);
     void generate_r1cs_witness(const pb_variable<FieldT> &commitment_x, const pb_variable<FieldT> &commitment_y,
@@ -87,12 +87,29 @@ public:
 
     static size_t verifying_input_bit_size() {
         size_t acc = 0;
-        acc += 1; // commitment x
-        acc += 1; // commitment y
+        acc += 253; // commitment x
+        acc += 253; // commitment y
         return acc;
     }
 
 };
+
+
+template<typename FieldT>
+class out_pedersen_commitment:public pedersen_commitment<FieldT> {
+public:
+    out_pedersen_commitment(
+            protoboard<FieldT> &in_pb,
+            const std::string &in_annotation_prefix
+    );
+    void generate_r1cs_witness(
+            const FieldT &comm_x,
+            const FieldT &comm_y,
+            const FieldT &in_m,
+            const FieldT &in_r
+    );
+};
+
 
 #include <pedersen_commitment.cpp>
 

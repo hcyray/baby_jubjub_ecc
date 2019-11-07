@@ -2,8 +2,8 @@
 // Created by hcy_ray on 10/29/19.
 //
 
-#ifndef BABY_JUBJUB_ECC_LEADER_PROOF_HPP
-#define BABY_JUBJUB_ECC_LEADER_PROOF_HPP
+#ifndef LEADER_PROOF_HPP_
+#define LEADER_PROOF_HPP_
 
 #include <cassert>
 #include <memory>
@@ -48,9 +48,9 @@ public:
 
     void generate_r1cs_constraints();
     void generate_r1cs_witness(FieldT &in_sn_m, FieldT &in_sn_r,
-                               pb_variable<FieldT> &sn_commit_x, pb_variable<FieldT> &sn_commit_y,
-                               pb_variable<FieldT> &in_T, FieldT &in_rep_m, FieldT &in_rep_r,
-                               pb_variable<FieldT> &rep_commit_x, pb_variable<FieldT> &rep_commit_y,
+                               FieldT &sn_commit_x, FieldT &sn_commit_y,
+                               FieldT &in_T, FieldT &in_rep_m, FieldT &in_rep_r,
+                               FieldT &rep_commit_x, FieldT &rep_commit_y,
                                FieldT &in_block_hash, FieldT &in_sl);
 
     static size_t verifying_field_element_size() {
@@ -59,13 +59,13 @@ public:
 
     static size_t verifying_input_bit_size() {
         size_t acc = 0;
-        acc += 1; // block_hash
-        acc += 1; //slot
-        acc += 1; // threshold T
-        acc += 1; // sn commitment x
-        acc += 1; // sn commitment y
-        acc += 1; //rep x
-        acc += 1; // rep y
+        acc += 253; // block_hash
+        acc += 253; //slot
+        acc += 253; // threshold T
+        acc += 253; // sn commitment x
+        acc += 253; // sn commitment y
+        acc += 253; //rep x
+        acc += 253; // rep y
 
         return acc;
     }

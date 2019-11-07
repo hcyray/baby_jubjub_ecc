@@ -17,6 +17,15 @@ typedef libsnark::pb_variable_array<FieldT> VariableArrayT;
 typedef libsnark::gadget<libff::Fr<ppT>> GadgetT;
 
 
+template<typename FieldT>
+void fill_with_bits_of_field_element_baby_jubjub(libsnark::protoboard<FieldT> &pb, libsnark::pb_variable_array<FieldT> &x, const FieldT &r)
+{
+    const libff::bigint<FieldT::num_limbs> rint = r.as_bigint();
+    for (size_t i = 0; i < x.size(); ++i)
+    {
+        pb.val((x)[x.size()- i - 1]) = rint.test_bit(i) ? FieldT::one() : FieldT::zero();
+    }
+}
 
 
 

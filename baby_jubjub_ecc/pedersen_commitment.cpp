@@ -26,12 +26,17 @@ using namespace libsnark;
 template<typename FieldT>
 
 
- pedersen_commitment<FieldT>:: pedersen_commitment(protoboard<FieldT> &pb, const std::string &annotation_prefix):
+ pedersen_commitment<FieldT>:: pedersen_commitment(protoboard<FieldT> &pb, const std::string &annotation_prefix, const bool &outlayer):
         gadget<FieldT>(pb, annotation_prefix)
 {
-    pb.set_input_sizes(verifying_field_element_size());
+
     commitment_x.allocate(pb, FMT(annotation_prefix, "commitment x"));
     commitment_y.allocate(pb, FMT(annotation_prefix, "commitment y"));
+
+    if (outlayer){
+        pb.set_input_sizes(verifying_field_element_size());
+    }
+
     m.allocate(pb, 253, FMT(annotation_prefix, " m"));
     r.allocate(pb, 253, FMT(annotation_prefix, " r"));
     base_x.allocate(pb, "base x");
@@ -114,6 +119,10 @@ void  pedersen_commitment<FieldT>::generate_r1cs_witness(
     jubjub_pointAddition->generate_r1cs_witness();
 }
 
+
+
+
+
 template<typename FieldT>
 pb_variable<FieldT>  pedersen_commitment<FieldT>::get_res_x(){
     return this->res_x;
@@ -125,3 +134,19 @@ pb_variable<FieldT>  pedersen_commitment<FieldT>::get_res_y(){
 
 }
 
+template<typename FieldT>
+out_pedersen_commitment<FieldT>::out_pedersen_commitment(
+        protoboard<FieldT> &in_pb,
+        const std::string &in_annotation_prefix
+): pedersen_commitment<FieldT>::pedersen_commitment(in_pb, in_annotation_prefix, true){
+}
+
+template<typename FieldT>
+void out_pedersen_commitment<FieldT>::generate_r1cs_witness(const FieldT &comm_x, const FieldT &comm_y, const FieldT &in_m,
+                                                      const FieldT &in_r) {
+    this->pb.val(this->commitment_x) = comm_x;
+    this->pb.val(this->commitment_y) = comm_y;
+    fill_with_bits_of_field_element_baby_jubjub(this->pb, this->m, in_m);
+    fill_with_bits_of_field_element_baby_jubjub(this->pb, this->r, in_r);
+    pedersen_commitment<FieldT>::generate_r1cs_witness(this->left_x, this->left_y, this-> right_x, this->right_y);
+}

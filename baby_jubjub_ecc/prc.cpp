@@ -13,7 +13,7 @@ using namespace libff;
 
 
 
-// test inputs taken from ../test/test_pedersen.py
+// prc - private reputation chain zksnark lib
 
 
 
@@ -176,6 +176,9 @@ void prc_prove_hpc(void *output_proof_ptr, ulong m_ulong, ulong r_ulong, char* c
 
 void prc_initialize(){
     libff::alt_bn128_pp::init_public_params();
+    libff::inhibit_profiling_info = true;
+    libff::inhibit_profiling_counters = true;
+
 }
 
 
