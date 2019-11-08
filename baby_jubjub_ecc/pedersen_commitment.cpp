@@ -120,9 +120,6 @@ void  pedersen_commitment<FieldT>::generate_r1cs_witness(
 }
 
 
-
-
-
 template<typename FieldT>
 pb_variable<FieldT>  pedersen_commitment<FieldT>::get_res_x(){
     return this->res_x;
@@ -143,10 +140,13 @@ out_pedersen_commitment<FieldT>::out_pedersen_commitment(
 
 template<typename FieldT>
 void out_pedersen_commitment<FieldT>::generate_r1cs_witness(const FieldT &comm_x, const FieldT &comm_y, const FieldT &in_m,
-                                                      const FieldT &in_r) {
+                                                      const FieldT &in_r)
+{
     this->pb.val(this->commitment_x) = comm_x;
     this->pb.val(this->commitment_y) = comm_y;
-    fill_with_bits_of_field_element_baby_jubjub(this->pb, this->m, in_m);
-    fill_with_bits_of_field_element_baby_jubjub(this->pb, this->r, in_r);
-    pedersen_commitment<FieldT>::generate_r1cs_witness(this->left_x, this->left_y, this-> right_x, this->right_y);
+
+    fill_with_bits_of_field_element_baby_jubjub<FieldT>(this->pb, this->m, in_m);
+    fill_with_bits_of_field_element_baby_jubjub<FieldT>(this->pb, this->r, in_r);
+
+    pedersen_commitment<FieldT>::generate_r1cs_witness(this->commitment_x, this->commitment_y, this-> m, this-> r);
 }

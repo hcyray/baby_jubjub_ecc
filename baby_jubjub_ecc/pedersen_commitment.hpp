@@ -24,7 +24,7 @@
 #include <memory>
 #include <baby_jubjub.hpp>
 #include <libsnark/gadgetlib1/gadget.hpp>
-
+#include "baby_jubjub_ecc.hpp"
 
 
 using namespace libsnark;
@@ -43,8 +43,7 @@ private:
     pb_variable_array<FieldT> A;
     pb_variable<FieldT> H_x;
     pb_variable<FieldT> H_y;
-    pb_variable_array<FieldT> m;
-    pb_variable_array<FieldT> r;
+
 
 
 
@@ -72,12 +71,14 @@ public:
 
     pb_variable<FieldT> commitment_x;
     pb_variable<FieldT> commitment_y;
+    pb_variable_array<FieldT> m;
+    pb_variable_array<FieldT> r;
 
     pedersen_commitment(protoboard<FieldT> &pb, const std::string &annotation_prefix, const bool &outlayer=false);
 
     void generate_r1cs_constraints(const bool commitment_check=true);
     void generate_r1cs_witness(const pb_variable<FieldT> &commitment_x, const pb_variable<FieldT> &commitment_y,
-                               const pb_variable_array<FieldT> &m, const pb_variable_array<FieldT> &r);
+                               const pb_variable_array<FieldT> &in_m, const pb_variable_array<FieldT> &in_r);
     pb_variable<FieldT> get_res_x();
     pb_variable<FieldT> get_res_y();
 

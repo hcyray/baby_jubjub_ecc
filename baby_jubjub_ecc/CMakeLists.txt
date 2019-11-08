@@ -9,8 +9,8 @@ add_library(
         baby_jubjub_ecc
         STATIC
         prc.cpp
-        leader_proof.cpp
-        merkle_tree.hpp
+        leader_proof.hpp
+        identity_proof.hpp
         pedersen_hash.hpp
         pedersen_commitment.hpp
         baby_jubjub.hpp

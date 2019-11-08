@@ -1,10 +1,6 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-#include "baby_jubjub_ecc.hpp"
-
-
-
 merkle_path_selector::merkle_path_selector(
     ProtoboardT &in_pb,
     const VariableT& in_input_x,
@@ -25,7 +21,8 @@ merkle_path_selector::merkle_path_selector(
     m_left_b_x.allocate(in_pb, FMT(this->annotation_prefix, ".left_b_x"));
     m_left_x.allocate(in_pb, FMT(this->annotation_prefix, ".left_x"));
 
-    m_left_a_y.allocate(in_pb, FMT(this->annotation_prefix, ".left_a_y"));
+    m_left_a_y.allocate(in_pb, FMT(this->ann
+    otation_prefix, ".left_a_y"));
     m_left_b_y.allocate(in_pb, FMT(this->annotation_prefix, ".left_b_y"));
     m_left_y.allocate(in_pb, FMT(this->annotation_prefix, ".left_y"));
 
@@ -118,7 +115,7 @@ const VariableT& merkle_path_selector::right_y() const {
 }
 
 
-markle_path_compute:: markle_path_compute(
+merkle_path_compute:: merkle_path_compute(
             ProtoboardT &in_pb,
             const size_t& in_depth,
             const std::string &in_annotation_prefix
@@ -130,7 +127,7 @@ markle_path_compute:: markle_path_compute(
         assert( in_address_bits.size() == in_depth );
         m_expected_root_x.allocate(pb,FMT(in_annotation_prefix, "expected root x"));
         m_expected_root_y.allocate(pb,FMT(in_annotation_prefix, "expected root y"));
-        pb.set_input_sizes(verifying_field_element_size());
+        //pb.set_input_sizes(verifying_field_element_size());
         //assert( in_IVs.size() >= in_depth * 2 );
         m_address_bits.allocate(pb, m_depth, FMT(annotation_prefix, "address_bit"));
         m_leaf_x.allocate(pb, FMT(annotation_prefix, "leaf_x"));
@@ -155,20 +152,20 @@ markle_path_compute:: markle_path_compute(
     }
 
 
-VariableT markle_path_compute::result_x(){
+VariableT merkle_path_compute::result_x(){
         assert( m_hashers.size() > 0 );
 
         return m_hashers.back()->get_res_x();
     }
 
 
-VariableT markle_path_compute::result_y() {
+VariableT merkle_path_compute::result_y() {
     assert( m_hashers.size() > 0 );
     return m_hashers.back()->get_res_y();
 }
 
 
-void markle_path_compute::generate_r1cs_constraints()
+void merkle_path_compute::generate_r1cs_constraints()
 {
     size_t i;
     for( i = 0; i < m_hashers.size(); i++ )
@@ -176,9 +173,15 @@ void markle_path_compute::generate_r1cs_constraints()
         m_selectors[i].generate_r1cs_constraints();
         m_hashers[i]->generate_r1cs_constraints();
     }
+    pb.add_r1cs_constraint(
+            ConstraintT(m_hashers.back()->get_res_x(), 1, m_expected_root_x),
+            FMT(this->annotation_prefix, ".expected_root_x authenticator"));
+    pb.add_r1cs_constraint(
+            ConstraintT(m_hashers.back()->get_res_y(), 1, m_expected_root_y),
+            FMT(this->annotation_prefix, ".expected_root_y authenticator"));
 }
 
-void markle_path_compute::generate_r1cs_witness(
+void merkle_path_compute::generate_r1cs_witness(
         const VariableArrayT& in_address_bits,
         const VariableT& in_leaf_x,
         const VariableT& in_leaf_y,
@@ -220,15 +223,34 @@ void markle_path_compute::generate_r1cs_witness(
 * Merkle path authenticator, verifies computed root matches expected result
 */
 
-merkle_path_authenticator::merkle_path_authenticator(
-            ProtoboardT &in_pb,
+identity_update_proof::identity_update_proof(
+            ProtoboardT &pb,
             const size_t& in_depth,
-            const std::string &in_annotation_prefix
-    ) :
-            markle_path_compute::markle_path_compute(in_pb, in_depth, in_annotation_prefix)
-    {}
+            const std::string &annotation_prefix
+    ) : GadgetT(pb, annotation_prefix)
+{
+    old_id_expected_root_x.allocate(pb, FMT(annotation_prefix, " old id expected root x"));
+    old_id_expected_root_y.allocate(pb, FMT(annotation_prefix, " old id expected root y"));
+    old_rep_expected_root_x.allocate(pb, FMT(annotation_prefix, " old rep expected root x"));
+    old_rep_expected_root_y.allocate(pb, FMT(annotation_prefix, " old rep expected root y"));
+    new_id_comm_x.allocate(pb, FMT(annotation_prefix, " new id comm x"));
+    new_id_comm_y.allocate(pb, FMT(annotation_prefix, " new id comm y"));
+    new_rep_comm_x.allocate(pb, FMT(annotation_prefix, " new rep comm x"));
+    new_rep_comm_y.allocate(pb, FMT(annotation_prefix, " new rep comm y"));
+    pb.set_input_sizes(verifying_field_element_size());
 
-bool merkle_path_authenticator::is_valid()
+    new_id_m.allocate(pb, 253, FMT(annotation_prefix, "new id m"));
+    new_id_r.allocate(pb, 253, FMT(annotation_prefix, "new id r"));
+    new_rep_m.allocate(pb, 253, FMT(annotation_prefix, "new id m"));
+    new_rep_r.allocate(pb, 253, FMT(annotation_prefix, "new id r"));
+
+    new_id_pedersen_comm.reset(new pedersen_commitment<FieldT>(pb, FMT(annotation_prefix, "new id pedersen commitment")));
+    new_rep_pedersen_comm.reset(new pedersen_commitment<FieldT>(pb, FMT(annotation_prefix, "new rep pedersen commitment")));
+    old_id_merkle_tree.reset(new merkle_path_compute(pb, in_depth, FMT(annotation_prefix," id merkle tree")));
+    old_rep_merkle_tree.reset(new merkle_path_compute(pb, in_depth, FMT(annotation_prefix," rep merkle tree")));
+}
+
+bool identity_update_proof::is_valid()
 {
     bool flag = true;
     if (this->pb.val(this->result_x()) != this->pb.val(m_expected_root_x) ||
@@ -238,20 +260,18 @@ bool merkle_path_authenticator::is_valid()
     return flag;
 }
 
-void merkle_path_authenticator::generate_r1cs_constraints()
+void identity_update_proof::generate_r1cs_constraints()
 {
-    markle_path_compute::generate_r1cs_constraints();
+    new_id_pedersen_comm -> generate_r1cs_constraints();
+    new_rep_pedersen_comm -> generate_r1cs_constraints();
+    old_id_merkle_tree -> generate_r1cs_constraints();
+    old_rep_merkle_tree -> generate_r1cs_constraints();
 
     // Ensure root matches calculated path hash
-    this->pb.add_r1cs_constraint(
-            ConstraintT(this->result_x(), 1, m_expected_root_x),
-            FMT(this->annotation_prefix, ".expected_root_x authenticator"));
-    this->pb.add_r1cs_constraint(
-            ConstraintT(this->result_y(), 1, m_expected_root_y),
-            FMT(this->annotation_prefix, ".expected_root_y authenticator"));
+
 }
 
-void merkle_path_authenticator::generate_r1cs_witness(
+void identity_update_proof::generate_r1cs_witness(
         const vector<FieldT> &in_address_bits, const FieldT &in_leaf_x, const FieldT &in_leaf_y,
         const FieldT &in_expected_root_x, const FieldT &in_expected_root_y, const vector<FieldT> &in_path)
 {
@@ -259,7 +279,7 @@ void merkle_path_authenticator::generate_r1cs_witness(
     this->m_path.fill_with_field_elements(this->pb, in_path);
     this->pb.val(this->m_leaf_x) = in_leaf_x;
     this->pb.val(this->m_leaf_y) = in_leaf_y;
-    markle_path_compute::generate_r1cs_witness(this->m_address_bits, this->m_leaf_x, this->m_leaf_y, this->m_path);
+    merkle_path_compute::generate_r1cs_witness(this->m_address_bits, this->m_leaf_x, this->m_leaf_y, this->m_path);
     pb.val(this->m_expected_root_x) = in_expected_root_x;
     pb.val(this->m_expected_root_y) = in_expected_root_y;
 }

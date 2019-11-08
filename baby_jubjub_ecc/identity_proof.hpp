@@ -4,7 +4,7 @@
 #include "baby_jubjub_ecc.hpp"
 #include "pedersen_hash.hpp"
 #include <memory>
-
+#include <cassert>
 /**
 * Depending on the address bit, output the correct left/right inputs
 * for the merkle path authentication hash
@@ -83,7 +83,7 @@ public:
 
 
 
-class markle_path_compute : public GadgetT
+class merkle_path_compute : public GadgetT
 {
 private:
     std::vector<merkle_path_selector> m_selectors;
@@ -98,7 +98,7 @@ public:
     VariableArrayT m_path;
 
 
-    markle_path_compute(
+    merkle_path_compute(
         ProtoboardT &in_pb,
         const size_t &in_depth,
         const std::string &in_annotation_prefix
@@ -116,16 +116,7 @@ public:
             const VariableT& in_leaf_y,
             const VariableArrayT& in_path
             );
-    static size_t verifying_field_element_size() {
-        return libff::div_ceil(verifying_input_bit_size(), FieldT::capacity());
-    }
 
-    static size_t verifying_input_bit_size() {
-        size_t acc = 0;
-        acc += 253; // expected root commitment x
-        acc += 253; // expected root commitment y
-        return acc;
-    }
 };
 
 
@@ -133,11 +124,28 @@ public:
 * Merkle path authenticator, verifies computed root matches expected result
 */
 
-class merkle_path_authenticator : public markle_path_compute
+class identity_update_proof : public GadgetT
 {
+private:
+    std::shared_ptr<merkle_path_compute> old_id_merkle_tree;
+    std::shared_ptr<merkle_path_compute> old_rep_merkle_tree;
+    std::shared_ptr<pedersen_commitment<FieldT>> new_id_pedersen_comm;
+    std::shared_ptr<pedersen_commitment<FieldT>> new_rep_pedersen_comm;
+    VariableArrayT new_id_m;
+    VariableArrayT new_id_r;
+    VariableArrayT new_rep_m;
+    VariableArrayT new_rep_r;
 public:
+    VariableT   old_id_expected_root_x;
+    VariableT   old_id_expected_root_y;
+    VariableT   old_rep_expected_root_x;
+    VariableT   old_rep_expected_root_y;
+    VariableT   new_id_comm_x;
+    VariableT   new_id_comm_y;
+    VariableT   new_rep_comm_x;
+    VariableT   new_rep_comm_y;
 
-    merkle_path_authenticator(
+    identity_update_proof(
         ProtoboardT &in_pb,
         const size_t& in_depth,
         const std::string &in_annotation_prefix
@@ -154,10 +162,26 @@ public:
             const FieldT &in_expected_root_y,
             const vector<FieldT> &in_path
             );
+    static size_t verifying_field_element_size() {
+        return libff::div_ceil(verifying_input_bit_size(), FieldT::capacity());
+    }
 
+    static size_t verifying_input_bit_size() {
+        size_t acc = 0;
+        acc += 253; // old id expected root commitment x
+        acc += 253; // old id expected root commitment y
+        acc += 253; // old rep expected root commitment x
+        acc += 253; // old rep expected root commitment y
+        acc += 253; // new id commitment x
+        acc += 253; // new id commitment y
+        acc += 253; // new rep commitment x
+        acc += 253; // new rep commitment y
+        return acc;
+    }
 };
 
 
 
-#include<merkle_tree.cpp>
+#include<identity_proof.cpp>
+
 #endif

@@ -57,8 +57,8 @@ void  pedersen_hash<FieldT>::generate_r1cs_witness(
     hash_pointAddition -> generate_r1cs_witness();
     FieldT temp_m = this->pb.val(m_var);
     FieldT temp_r = this->pb.val(r_var);
-    fill_with_bits_of_field_element_baby_jubjub(this->pb, m,this->pb.val(m_var));
-    fill_with_bits_of_field_element_baby_jubjub(this->pb, r,this->pb.val(r_var));
+    fill_with_bits_of_field_element_baby_jubjub<FieldT>(this->pb, m,this->pb.val(m_var));
+    fill_with_bits_of_field_element_baby_jubjub<FieldT>(this->pb, r,this->pb.val(r_var));
     commit -> generate_r1cs_witness(a, d, m, r);
     /*
     std::stringstream comm_data_m, comm_data_r;

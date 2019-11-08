@@ -51,7 +51,7 @@ int main () {
     cout << "proof size :" << proof_str.size() << endl;
     cout <<  pb.primary_input() << endl;
     cout <<"Finish" << endl;
-    cout  << constraint_system.primary_input_size << endl;
+
     return 0;
 
 }

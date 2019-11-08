@@ -47,11 +47,11 @@ public:
     leader_proof(protoboard<FieldT> &pb, const std::string &annotation_prefix);
 
     void generate_r1cs_constraints();
-    void generate_r1cs_witness(FieldT &in_sn_m, FieldT &in_sn_r,
-                               FieldT &sn_commit_x, FieldT &sn_commit_y,
-                               FieldT &in_T, FieldT &in_rep_m, FieldT &in_rep_r,
-                               FieldT &rep_commit_x, FieldT &rep_commit_y,
-                               FieldT &in_block_hash, FieldT &in_sl);
+    void generate_r1cs_witness(const FieldT &in_sn_m, const FieldT &in_sn_r,
+                               const FieldT &sn_commit_x, const FieldT &sn_commit_y,
+                               const FieldT &in_T, const FieldT &in_rep_m, const FieldT &in_rep_r,
+                               const FieldT &rep_commit_x, const FieldT &rep_commit_y,
+                               const FieldT &in_block_hash, const FieldT &in_sl);
 
     static size_t verifying_field_element_size() {
         return libff::div_ceil(verifying_input_bit_size(), FieldT::capacity());

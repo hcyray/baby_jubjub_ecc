@@ -24,15 +24,11 @@ leader_proof<FieldT>::leader_proof(protoboard<FieldT> &pb, const std::string &an
     rep_x.allocate(pb, FMT(annotation_prefix, "rep x"));
     rep_y.allocate(pb, FMT(annotation_prefix, "rep y"));
     pb.set_input_sizes(verifying_field_element_size());
-    cout <<FieldT::capacity() << endl;
-    cout <<"intput size:"<<verifying_field_element_size() << endl;
 
     sn_m.allocate(pb, 253, FMT(annotation_prefix, "sn m"));
     sn_r.allocate(pb, 253, FMT(annotation_prefix, "sn r"));
-
     rep_m.allocate(pb, 253, FMT(annotation_prefix, "rep m"));
     rep_r.allocate(pb, 253, FMT(annotation_prefix, "rep r"));
-    T.allocate(pb,FMT(annotation_prefix, "threshold"));
     rep.allocate(pb,FMT(annotation_prefix, "rep score"));
     ran.allocate(pb,FMT(annotation_prefix, "random number"));
     repRN.allocate(pb, FMT(annotation_prefix, "rep times random"));
@@ -60,25 +56,24 @@ void leader_proof<FieldT>::generate_r1cs_constraints(){
 }
 
 template<typename FieldT>
-void leader_proof<FieldT>::generate_r1cs_witness(FieldT &in_sn_m, FieldT &in_sn_r,
-                           FieldT &sn_commit_x, FieldT &sn_commit_y,
-                           FieldT &in_T, FieldT &in_rep_m, FieldT &in_rep_r,
-                           FieldT &rep_commit_x, FieldT &rep_commit_y,
-                           FieldT &in_block_hash, FieldT &in_sl)
+void leader_proof<FieldT>::generate_r1cs_witness(const FieldT &in_sn_m, const FieldT &in_sn_r,
+                                                 const FieldT &sn_commit_x, const FieldT &sn_commit_y,
+                                                 const FieldT &in_T, const FieldT &in_rep_m, const FieldT &in_rep_r,
+                                                 const FieldT &rep_commit_x, const FieldT &rep_commit_y,
+                                                 const FieldT &in_block_hash, const FieldT &in_sl)
 {
     this -> pb.val(T) = in_T;
     this -> pb.val(block_hash) = in_block_hash;
     this -> pb.val(sl) = in_sl;
-
     this -> pb.val(sn_x) = sn_commit_x;
     this -> pb.val(sn_y) = sn_commit_y;
-    fill_with_bits_of_field_element_baby_jubjub(this -> pb, sn_m, in_sn_m);
-    fill_with_bits_of_field_element_baby_jubjub(this -> pb, sn_r, in_sn_r);
+    fill_with_bits_of_field_element_baby_jubjub<FieldT>(this -> pb, sn_m, in_sn_m);
+    fill_with_bits_of_field_element_baby_jubjub<FieldT>(this -> pb, sn_r, in_sn_r);
 
     this -> pb.val(rep_x) = rep_commit_x;
     this -> pb.val(rep_y) = rep_commit_y;
-    fill_with_bits_of_field_element_baby_jubjub(this -> pb, rep_m, in_rep_m);
-    fill_with_bits_of_field_element_baby_jubjub(this -> pb, rep_r, in_rep_r);
+    fill_with_bits_of_field_element_baby_jubjub<FieldT>(this -> pb, rep_m, in_rep_m);
+    fill_with_bits_of_field_element_baby_jubjub<FieldT>(this -> pb, rep_r, in_rep_r);
     this -> pb.val(rep) = in_rep_m;
 
     snCommit->generate_r1cs_witness(sn_x, sn_y, this->sn_m, this->sn_r);

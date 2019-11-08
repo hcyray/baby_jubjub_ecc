@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "merkle_tree.hpp"
+#include "identity_proof.hpp"
 #include "pedersen_hash.hpp"
 #include <libsnark/zk_proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
 using namespace std;
