@@ -77,7 +77,7 @@ void test_iup(){
     ifstream infile;
     infile.open("merkle.txt");
     if(!infile) {
-        cerr << "Unable to open file datafile.txt";
+        cerr << "Unable to open file txt";
         exit(1);
     }
     int id = 1;
