@@ -88,14 +88,16 @@ class merkle_path_compute : public GadgetT
 private:
     std::vector<merkle_path_selector> m_selectors;
     std::vector<std::shared_ptr <pedersen_hash<FieldT>>> m_hashers;
-public:
-    VariableT m_expected_root_x;
-    VariableT m_expected_root_y;
-    size_t m_depth;
     VariableArrayT m_address_bits;
     VariableT m_leaf_x;
     VariableT m_leaf_y;
     VariableArrayT m_path;
+
+public:
+    VariableT m_expected_root_x;
+    VariableT m_expected_root_y;
+    size_t m_depth;
+
 
 
     merkle_path_compute(
@@ -111,10 +113,12 @@ public:
     void generate_r1cs_constraints();
 
     void generate_r1cs_witness(
-            const VariableArrayT& in_address_bits,
-            const VariableT& in_leaf_x,
-            const VariableT& in_leaf_y,
-            const VariableArrayT& in_path
+            const vector<FieldT>& in_address_bits,
+            const FieldT& in_leaf_x,
+            const FieldT& in_leaf_y,
+            const vector<FieldT>& in_path,
+            const VariableT& in_expected_root_x,
+            const VariableT& in_expected_root_y
             );
 
 };
@@ -127,12 +131,24 @@ public:
 class identity_update_proof : public GadgetT
 {
 private:
+    /*
+    VariableT   id_leaf_x;
+    VariableT   id_leaf_y;
+    VariableArrayT  id_address_bits;
+    VariableArrayT  id_path;
+    VariableT   rep_leaf_x;
+    VariableT   rep_leaf_y;
+    VariableArrayT  rep_address_bits;
+    VariableArrayT  rep_path;
+    */
     std::shared_ptr<merkle_path_compute> old_id_merkle_tree;
     std::shared_ptr<merkle_path_compute> old_rep_merkle_tree;
     std::shared_ptr<pedersen_commitment<FieldT>> new_id_pedersen_comm;
     std::shared_ptr<pedersen_commitment<FieldT>> new_rep_pedersen_comm;
+
     VariableArrayT new_id_m;
     VariableArrayT new_id_r;
+
     VariableArrayT new_rep_m;
     VariableArrayT new_rep_r;
 public:
@@ -151,16 +167,16 @@ public:
         const std::string &in_annotation_prefix
     );
 
-    bool is_valid();
+    //bool is_valid();
 
     void generate_r1cs_constraints();
     void generate_r1cs_witness(
-            const vector<FieldT> &in_address_bits,
-            const FieldT &in_leaf_x,
-            const FieldT &in_leaf_y,
-            const FieldT &in_expected_root_x,
-            const FieldT &in_expected_root_y,
-            const vector<FieldT> &in_path
+            const vector<FieldT> &in_id_address_bits, const FieldT &in_id_leaf_x, const FieldT &in_id_leaf_y,
+            const FieldT &in_id_expected_root_x, const FieldT &in_id_expected_root_y, const vector<FieldT> &in_id_path,
+            const vector<FieldT> &in_rep_address_bits, const FieldT &in_rep_leaf_x, const FieldT &in_rep_leaf_y,
+            const FieldT &in_rep_expected_root_x, const FieldT &in_rep_expected_root_y, const vector<FieldT> &in_rep_path,
+            const FieldT &in_new_id_m, const FieldT &in_new_id_r, const FieldT &in_new_id_x, const FieldT &in_new_id_y,
+            const FieldT &in_new_rep_m, const FieldT &in_new_rep_r, const FieldT &in_new_rep_x, const FieldT &in_new_rep_y
             );
     static size_t verifying_field_element_size() {
         return libff::div_ceil(verifying_input_bit_size(), FieldT::capacity());

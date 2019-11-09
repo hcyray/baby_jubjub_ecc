@@ -21,8 +21,7 @@ merkle_path_selector::merkle_path_selector(
     m_left_b_x.allocate(in_pb, FMT(this->annotation_prefix, ".left_b_x"));
     m_left_x.allocate(in_pb, FMT(this->annotation_prefix, ".left_x"));
 
-    m_left_a_y.allocate(in_pb, FMT(this->ann
-    otation_prefix, ".left_a_y"));
+    m_left_a_y.allocate(in_pb, FMT(this->annotation_prefix, ".left_a_y"));
     m_left_b_y.allocate(in_pb, FMT(this->annotation_prefix, ".left_b_y"));
     m_left_y.allocate(in_pb, FMT(this->annotation_prefix, ".left_y"));
 
@@ -182,16 +181,20 @@ void merkle_path_compute::generate_r1cs_constraints()
 }
 
 void merkle_path_compute::generate_r1cs_witness(
-        const VariableArrayT& in_address_bits,
-        const VariableT& in_leaf_x,
-        const VariableT& in_leaf_y,
-        const VariableArrayT& in_path
+        const vector<FieldT>& in_address_bits,
+        const FieldT& in_leaf_x,
+        const FieldT& in_leaf_y,
+        const vector<FieldT>& in_path,
+        const VariableT& in_expected_root_x,
+        const VariableT& in_expected_root_y
         )
 {
-    m_address_bits.fill_with_field_elements(pb, in_address_bits.get_vals(pb));
-    pb.val(m_leaf_x) = pb.val(in_leaf_x);
-    pb.val(m_leaf_y) = pb.val(in_leaf_y);
-    m_path.fill_with_field_elements(pb, in_path.get_vals(pb));
+    pb.val(m_expected_root_x) = pb.val(in_expected_root_x);
+    pb.val(m_expected_root_y) = pb.val(in_expected_root_y);
+    m_address_bits.fill_with_field_elements(pb, in_address_bits);
+    pb.val(m_leaf_x) = in_leaf_x;
+    pb.val(m_leaf_y) = in_leaf_y;
+    m_path.fill_with_field_elements(pb, in_path);
     size_t i;
     for( i = 0; i < m_hashers.size(); i++ )
     {
@@ -200,21 +203,12 @@ void merkle_path_compute::generate_r1cs_witness(
                                             m_selectors[i].right_x(),m_selectors[i].right_y());
     }
 
-//    Debug
-//    for( i = 0; i < m_hashers.size(); i++ )
-//    {
-//        std::cout << this->pb.val(m_hashers[i]->get_res_x()) << std::endl;
-//        std::cout << this->pb.val(m_hashers[i]->get_res_y()) << std::endl;
-//    }
-//
-//    for( i = 0; i < m_selectors.size(); i++ )
-//    {
-//        std::cout << "i:" <<i << std::endl;
-//        std::cout << this->pb.val(m_selectors[i].left_x()) << std::endl;
-//        std::cout << this->pb.val(m_selectors[i].left_y()) << std::endl;
-//        std::cout << this->pb.val(m_selectors[i].right_x()) << std::endl;
-//        std::cout << this->pb.val(m_selectors[i].right_y()) << std::endl;
-//    }
+//    cout << "merkle tree result:" << endl;
+//    cout << pb.val(m_expected_root_x) << endl;
+//    cout << pb.val(m_expected_root_y) << endl;
+//    cout << pb.val(m_hashers.back()->get_res_x()) << endl;
+//    cout << pb.val(m_hashers.back()->get_res_y()) << endl;
+
 }
 
 
@@ -239,26 +233,17 @@ identity_update_proof::identity_update_proof(
     new_rep_comm_y.allocate(pb, FMT(annotation_prefix, " new rep comm y"));
     pb.set_input_sizes(verifying_field_element_size());
 
-    new_id_m.allocate(pb, 253, FMT(annotation_prefix, "new id m"));
-    new_id_r.allocate(pb, 253, FMT(annotation_prefix, "new id r"));
-    new_rep_m.allocate(pb, 253, FMT(annotation_prefix, "new id m"));
-    new_rep_r.allocate(pb, 253, FMT(annotation_prefix, "new id r"));
+    new_id_m.allocate(pb, 253, FMT(annotation_prefix, " new id m"));
+    new_id_r.allocate(pb, 253, FMT(annotation_prefix, " new id r"));
+    new_rep_m.allocate(pb, 253, FMT(annotation_prefix, " new rep m"));
+    new_rep_r.allocate(pb, 253, FMT(annotation_prefix, " new rep r"));
 
-    new_id_pedersen_comm.reset(new pedersen_commitment<FieldT>(pb, FMT(annotation_prefix, "new id pedersen commitment")));
-    new_rep_pedersen_comm.reset(new pedersen_commitment<FieldT>(pb, FMT(annotation_prefix, "new rep pedersen commitment")));
+    new_id_pedersen_comm.reset(new pedersen_commitment<FieldT>(pb, FMT(annotation_prefix, " new id pedersen commitment")));
+    new_rep_pedersen_comm.reset(new pedersen_commitment<FieldT>(pb, FMT(annotation_prefix, " new rep pedersen commitment")));
     old_id_merkle_tree.reset(new merkle_path_compute(pb, in_depth, FMT(annotation_prefix," id merkle tree")));
     old_rep_merkle_tree.reset(new merkle_path_compute(pb, in_depth, FMT(annotation_prefix," rep merkle tree")));
 }
 
-bool identity_update_proof::is_valid()
-{
-    bool flag = true;
-    if (this->pb.val(this->result_x()) != this->pb.val(m_expected_root_x) ||
-        this->pb.val(this->result_y()) != this->pb.val(m_expected_root_y)){
-        flag = false;
-    }
-    return flag;
-}
 
 void identity_update_proof::generate_r1cs_constraints()
 {
@@ -272,15 +257,33 @@ void identity_update_proof::generate_r1cs_constraints()
 }
 
 void identity_update_proof::generate_r1cs_witness(
-        const vector<FieldT> &in_address_bits, const FieldT &in_leaf_x, const FieldT &in_leaf_y,
-        const FieldT &in_expected_root_x, const FieldT &in_expected_root_y, const vector<FieldT> &in_path)
+        const vector<FieldT> &in_id_address_bits, const FieldT &in_id_leaf_x, const FieldT &in_id_leaf_y,
+        const FieldT &in_id_expected_root_x, const FieldT &in_id_expected_root_y, const vector<FieldT> &in_id_path,
+        const vector<FieldT> &in_rep_address_bits, const FieldT &in_rep_leaf_x, const FieldT &in_rep_leaf_y,
+        const FieldT &in_rep_expected_root_x, const FieldT &in_rep_expected_root_y, const vector<FieldT> &in_rep_path,
+        const FieldT &in_new_id_m, const FieldT &in_new_id_r, const FieldT &in_new_id_x, const FieldT &in_new_id_y,
+        const FieldT &in_new_rep_m, const FieldT &in_new_rep_r, const FieldT &in_new_rep_x, const FieldT &in_new_rep_y
+        )
 {
-    this->m_address_bits.fill_with_field_elements(this->pb, in_address_bits);
-    this->m_path.fill_with_field_elements(this->pb, in_path);
-    this->pb.val(this->m_leaf_x) = in_leaf_x;
-    this->pb.val(this->m_leaf_y) = in_leaf_y;
-    merkle_path_compute::generate_r1cs_witness(this->m_address_bits, this->m_leaf_x, this->m_leaf_y, this->m_path);
-    pb.val(this->m_expected_root_x) = in_expected_root_x;
-    pb.val(this->m_expected_root_y) = in_expected_root_y;
+    pb.val(old_id_expected_root_x) = in_id_expected_root_x;
+    pb.val(old_id_expected_root_y) = in_id_expected_root_y;
+    pb.val(old_rep_expected_root_x) = in_rep_expected_root_x;
+    pb.val(old_rep_expected_root_y) = in_rep_expected_root_y;
+
+    pb.val(new_id_comm_x) = in_new_id_x;
+    pb.val(new_id_comm_y) = in_new_id_y;
+    pb.val(new_rep_comm_x) = in_new_rep_x;
+    pb.val(new_rep_comm_y) = in_new_rep_y;
+
+    fill_with_bits_of_field_element_baby_jubjub<FieldT>(pb, new_id_m, in_new_id_m);
+    fill_with_bits_of_field_element_baby_jubjub<FieldT>(pb, new_id_r, in_new_id_r);
+    fill_with_bits_of_field_element_baby_jubjub<FieldT>(pb, new_rep_m, in_new_rep_m);
+    fill_with_bits_of_field_element_baby_jubjub<FieldT>(pb, new_rep_r, in_new_rep_r);
+
+    new_id_pedersen_comm -> generate_r1cs_witness(new_id_comm_x, new_id_comm_y, new_id_m, new_id_r);
+    new_rep_pedersen_comm ->generate_r1cs_witness(new_rep_comm_x, new_rep_comm_y, new_rep_m, new_rep_r);
+    old_id_merkle_tree->generate_r1cs_witness(in_id_address_bits, in_id_leaf_x, in_id_leaf_y, in_id_path, old_id_expected_root_x, old_id_expected_root_y);
+    old_rep_merkle_tree->generate_r1cs_witness(in_rep_address_bits, in_rep_leaf_x, in_rep_leaf_y, in_rep_path, old_rep_expected_root_x, old_rep_expected_root_y);
+
 }
 
