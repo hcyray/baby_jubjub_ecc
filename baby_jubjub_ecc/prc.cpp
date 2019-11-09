@@ -77,10 +77,9 @@ void prc_initialize(){
     libff::alt_bn128_pp::init_public_params();
     libff::inhibit_profiling_info = true;
     libff::inhibit_profiling_counters = true;
-
 }
 
-bool prc_verify_hpc(void *proof_ptr, char *comm_x, char *comm_y, int id) {
+bool prc_verify_hpc(void *proof_ptr, char *comm_x, char *comm_y) {
     unsigned char *proof = reinterpret_cast<unsigned char *>(proof_ptr);
     //input proof
     std::vector<unsigned char> proof_v(proof, proof+312);
@@ -99,12 +98,12 @@ bool prc_verify_hpc(void *proof_ptr, char *comm_x, char *comm_y, int id) {
     witness_map.insert(witness_map.end(), FieldT(comm_y));
 
     r1cs_ppzksnark_verification_key<libff::alt_bn128_pp> verification_key;
-    loadFromFile<r1cs_ppzksnark_verification_key<ppT>>(to_string(id) + "_hpc.vk", verification_key);
+    loadFromFile<r1cs_ppzksnark_verification_key<ppT>>("hpc.vk", verification_key);
     return r1cs_ppzksnark_verifier_strong_IC<libff::alt_bn128_pp>(verification_key, witness_map, proof_obj);
 }
 
 
-void prc_prove_hpc(void *output_proof_ptr, ulong m_ulong, ulong r_ulong, char* comm_x, char* comm_y, int id){
+void prc_prove_hpc(void *output_proof_ptr, ulong m_ulong, ulong r_ulong, char* comm_x, char* comm_y){
     unsigned char *output_proof = reinterpret_cast<unsigned char *>(output_proof_ptr);
     protoboard<FieldT> pb;
     out_pedersen_commitment<FieldT> g(pb,"pedersen commitment");
@@ -114,7 +113,7 @@ void prc_prove_hpc(void *output_proof_ptr, ulong m_ulong, ulong r_ulong, char* c
     assert(pb.is_satisfied());
 
     r1cs_ppzksnark_proving_key<libff::alt_bn128_pp> proving_key;
-    loadFromFile<r1cs_ppzksnark_proving_key<ppT>>(to_string(id) + "_hpc.pk", proving_key);
+    loadFromFile<r1cs_ppzksnark_proving_key<ppT>>("hpc.pk", proving_key);
 
     r1cs_ppzksnark_proof<libff::alt_bn128_pp> proof = r1cs_ppzksnark_prover<libff::alt_bn128_pp>(proving_key, pb.primary_input(), pb.auxiliary_input());
     std::stringstream proof_data;
@@ -126,7 +125,7 @@ void prc_prove_hpc(void *output_proof_ptr, ulong m_ulong, ulong r_ulong, char* c
     }
 }
 
-void prc_paramgen_hpc(int id) {
+void prc_paramgen_hpc() {
     protoboard<FieldT> pb;
     out_pedersen_commitment<FieldT> g(pb,"pedersen commitment");
     g.generate_r1cs_constraints();
@@ -135,13 +134,13 @@ void prc_paramgen_hpc(int id) {
     cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << endl;
     auto crs = r1cs_ppzksnark_generator<ppT>(constraint_system);
 
-    saveToFile<r1cs_ppzksnark_proving_key<ppT>>(to_string(id) + "_hpc.pk", crs.pk);
-    saveToFile<r1cs_ppzksnark_verification_key<ppT>>(to_string(id) + "_hpc.vk", crs.vk);
+    saveToFile<r1cs_ppzksnark_proving_key<ppT>>("hpc.pk", crs.pk);
+    saveToFile<r1cs_ppzksnark_verification_key<ppT>>("hpc.vk", crs.vk);
 
 }
 
 bool prc_verify_lp(void *proof_ptr, char* sn_comm_x, char* sn_comm_y, char* T,
-                   char* rep_comm_x, char* rep_comm_y, char* block_hash, int sl, int id) {
+                   char* rep_comm_x, char* rep_comm_y, char* block_hash, int sl) {
     unsigned char *proof = reinterpret_cast<unsigned char *>(proof_ptr);
     //input proof
     std::vector<unsigned char> proof_v(proof, proof+312);
@@ -165,13 +164,13 @@ bool prc_verify_lp(void *proof_ptr, char* sn_comm_x, char* sn_comm_y, char* T,
     witness_map.insert(witness_map.end(), FieldT(rep_comm_y));
 
     r1cs_ppzksnark_verification_key<libff::alt_bn128_pp> verification_key;
-    loadFromFile<r1cs_ppzksnark_verification_key<ppT>>(to_string(id) + "_lp.vk", verification_key);
+    loadFromFile<r1cs_ppzksnark_verification_key<ppT>>("lp.vk", verification_key);
     return r1cs_ppzksnark_verifier_strong_IC<libff::alt_bn128_pp>(verification_key, witness_map, proof_obj);
 }
 
 
 void prc_prove_lp(void *output_proof_ptr, ulong sn_m, ulong sn_r, char* sn_comm_x, char* sn_comm_y, char* T,
-        ulong rep_m, ulong rep_r, char* rep_comm_x, char* rep_comm_y, char* block_hash, int sl, int id){
+        ulong rep_m, ulong rep_r, char* rep_comm_x, char* rep_comm_y, char* block_hash, int sl){
     unsigned char *output_proof = reinterpret_cast<unsigned char *>(output_proof_ptr);
     protoboard<FieldT> pb;
     leader_proof<FieldT> g(pb," leader_proof");
@@ -182,7 +181,7 @@ void prc_prove_lp(void *output_proof_ptr, ulong sn_m, ulong sn_r, char* sn_comm_
     assert(pb.is_satisfied());
 
     r1cs_ppzksnark_proving_key<libff::alt_bn128_pp> proving_key;
-    loadFromFile<r1cs_ppzksnark_proving_key<ppT>>(to_string(id) + "_lp.pk", proving_key);
+    loadFromFile<r1cs_ppzksnark_proving_key<ppT>>("lp.pk", proving_key);
 
     r1cs_ppzksnark_proof<libff::alt_bn128_pp> proof = r1cs_ppzksnark_prover<libff::alt_bn128_pp>(proving_key, pb.primary_input(), pb.auxiliary_input());
     std::stringstream proof_data;
@@ -194,7 +193,7 @@ void prc_prove_lp(void *output_proof_ptr, ulong sn_m, ulong sn_r, char* sn_comm_
     }
 }
 
-void prc_paramgen_lp(int id) {
+void prc_paramgen_lp() {
     protoboard<FieldT> pb;
     leader_proof<FieldT> g(pb," leader proof");
     g.generate_r1cs_constraints();
@@ -203,13 +202,13 @@ void prc_paramgen_lp(int id) {
     cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << endl;
     auto crs = r1cs_ppzksnark_generator<ppT>(constraint_system);
 
-    saveToFile<r1cs_ppzksnark_proving_key<ppT>>(to_string(id) + "_lp.pk", crs.pk);
-    saveToFile<r1cs_ppzksnark_verification_key<ppT>>(to_string(id) + "_lp.vk", crs.vk);
+    saveToFile<r1cs_ppzksnark_proving_key<ppT>>("lp.pk", crs.pk);
+    saveToFile<r1cs_ppzksnark_verification_key<ppT>>("lp.vk", crs.vk);
 
 }
 
 bool prc_verify_iup(void *proof_ptr, char* old_id_root_x, char* old_id_root_y, char* old_rep_root_x, char* old_rep_root_y,
-                   char* new_id_x, char* new_id_y, char* new_rep_x, char* new_rep_y, int id) {
+                   char* new_id_x, char* new_id_y, char* new_rep_x, char* new_rep_y) {
     unsigned char *proof = reinterpret_cast<unsigned char *>(proof_ptr);
     //input proof
     std::vector<unsigned char> proof_v(proof, proof+312);
@@ -234,7 +233,7 @@ bool prc_verify_iup(void *proof_ptr, char* old_id_root_x, char* old_id_root_y, c
     witness_map.insert(witness_map.end(), FieldT(new_rep_y));
 
     r1cs_ppzksnark_verification_key<libff::alt_bn128_pp> verification_key;
-    loadFromFile<r1cs_ppzksnark_verification_key<ppT>>(to_string(id) + "_iup.vk", verification_key);
+    loadFromFile<r1cs_ppzksnark_verification_key<ppT>>("iup.vk", verification_key);
     return r1cs_ppzksnark_verifier_strong_IC<libff::alt_bn128_pp>(verification_key, witness_map, proof_obj);
 }
 
@@ -242,7 +241,7 @@ bool prc_verify_iup(void *proof_ptr, char* old_id_root_x, char* old_id_root_y, c
 void prc_prove_iup(void *output_proof_ptr, int depth, bool in_id_address_bits[], char* id_leaf_x, char* id_leaf_y,
         char* id_root_x, char* id_root_y, char* in_id_path[], bool in_rep_address_bits[], char* rep_leaf_x, char * rep_leaf_y,
         char* rep_root_x, char* rep_root_y, char* in_rep_path[], ulong id_m, ulong id_r, char* id_x, char* id_y,
-        ulong rep_m, ulong rep_r, char* rep_x, char* rep_y, int id){
+        ulong rep_m, ulong rep_r, char* rep_x, char* rep_y){
     unsigned char *output_proof = reinterpret_cast<unsigned char *>(output_proof_ptr);
     protoboard<FieldT> pb;
     identity_update_proof g(pb, depth," identity update");
@@ -274,7 +273,7 @@ void prc_prove_iup(void *output_proof_ptr, int depth, bool in_id_address_bits[],
     assert(pb.is_satisfied());
 
     r1cs_ppzksnark_proving_key<libff::alt_bn128_pp> proving_key;
-    loadFromFile<r1cs_ppzksnark_proving_key<ppT>>(to_string(id) + "_iup.pk", proving_key);
+    loadFromFile<r1cs_ppzksnark_proving_key<ppT>>("iup.pk", proving_key);
 
     r1cs_ppzksnark_proof<libff::alt_bn128_pp> proof = r1cs_ppzksnark_prover<libff::alt_bn128_pp>(proving_key, pb.primary_input(), pb.auxiliary_input());
     std::stringstream proof_data;
@@ -286,7 +285,7 @@ void prc_prove_iup(void *output_proof_ptr, int depth, bool in_id_address_bits[],
     }
 }
 
-void prc_paramgen_iup(int id, int depth) {
+void prc_paramgen_iup(int depth) {
     protoboard<FieldT> pb;
     identity_update_proof g(pb, depth," identity update");
     g.generate_r1cs_constraints();
@@ -295,7 +294,7 @@ void prc_paramgen_iup(int id, int depth) {
     cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << endl;
     auto crs = r1cs_ppzksnark_generator<ppT>(constraint_system);
 
-    saveToFile<r1cs_ppzksnark_proving_key<ppT>>(to_string(id) + "_iup.pk", crs.pk);
-    saveToFile<r1cs_ppzksnark_verification_key<ppT>>(to_string(id) + "_iup.vk", crs.vk);
+    saveToFile<r1cs_ppzksnark_proving_key<ppT>>("iup.pk", crs.pk);
+    saveToFile<r1cs_ppzksnark_verification_key<ppT>>("iup.vk", crs.vk);
 
 }

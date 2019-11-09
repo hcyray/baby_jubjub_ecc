@@ -1,7 +1,6 @@
 #include <fstream>
 #include <prc.h>
 #include <iostream>
-#include<sstream>
 #include <time.h>
 using namespace std;
 clock_t t;
@@ -9,9 +8,8 @@ double time_used;
 int n = 50;
 void test_hpc(){
     cout <<"Test pedersen commitment" <<endl;
-    int id = 1;
     t = clock();
-    prc_paramgen_hpc(id);
+    prc_paramgen_hpc();
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "initialize success--------------------------------------" << endl;
@@ -22,14 +20,14 @@ void test_hpc(){
     char *comm_x = "18517123153863469553573384572371536953407444696640934598826194274645946323334";
     char *comm_y = "16366639365004517936716040800897479058579589069997927276858356063876961184474";
     t = clock();
-    prc_prove_hpc(proof, 2, 2, comm_x, comm_y,id);
+    prc_prove_hpc(proof, 2, 2, comm_x, comm_y);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "prove success--------------------------------------" << endl;
     cout << "prove time used: " << time_used<< endl;
 
     t = clock();
-    bool verify_result = prc_verify_hpc(proof, comm_x, comm_y,id);
+    bool verify_result = prc_verify_hpc(proof, comm_x, comm_y);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "verification result : " << verify_result << endl;
@@ -39,7 +37,6 @@ void test_hpc(){
 
 void test_lp(){
     cout <<"Test leader proof" <<endl;
-    int id = 1;
     char* block_hash = "1234";
     char* T = "12845949072827470624709637419912138308739243446882777103948483823386985213512";
     char* sn_x = "18517123153863469553573384572371536953407444696640934598826194274645946323334";
@@ -49,7 +46,7 @@ void test_lp(){
     int sl = 1;
 
     t = clock();
-    prc_paramgen_lp(id);
+    prc_paramgen_lp();
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "initialize success--------------------------------------" << endl;
@@ -57,14 +54,14 @@ void test_lp(){
 
     unsigned char proof [312];
     t = clock();
-    prc_prove_lp(proof, 2, 2, sn_x, sn_y,T, 2,2, rep_x, rep_y,block_hash, sl,id);
+    prc_prove_lp(proof, 2, 2, sn_x, sn_y,T, 2,2, rep_x, rep_y,block_hash, sl);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "prove success--------------------------------------" << endl;
     cout << "prove time used: " << time_used<< endl;
 
     t = clock();
-    bool verify_result = prc_verify_lp(proof, sn_x, sn_y,T, rep_x, rep_y,block_hash, sl,id);
+    bool verify_result = prc_verify_lp(proof, sn_x, sn_y,T, rep_x, rep_y,block_hash, sl);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "verification result : " << verify_result << endl;
@@ -80,7 +77,6 @@ void test_iup(){
         cerr << "Unable to open file txt";
         exit(1);
     }
-    int id = 1;
     int depth;
     infile >> depth;
     bool id_address_bits[depth];
@@ -141,7 +137,7 @@ void test_iup(){
     char* rep_y = "16366639365004517936716040800897479058579589069997927276858356063876961184474";
 
     t = clock();
-    prc_paramgen_iup(id,depth);
+    prc_paramgen_iup(depth);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "initialize success--------------------------------------" << endl;
@@ -151,7 +147,7 @@ void test_iup(){
     t = clock();
     prc_prove_iup(proof, depth, id_address_bits, id_leaf_x, id_leaf_y, id_root_x, id_root_y, id_path,
             rep_address_bits, rep_leaf_x, rep_leaf_y, rep_root_x, rep_root_y, rep_path,
-            id_m, id_r, id_x, id_y, rep_m, rep_r, rep_x, rep_y, id);
+            id_m, id_r, id_x, id_y, rep_m, rep_r, rep_x, rep_y);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "prove success--------------------------------------" << endl;
@@ -159,7 +155,7 @@ void test_iup(){
 
     t = clock();
     bool verify_result = prc_verify_iup(proof, id_root_x, id_root_y,
-            rep_root_x, rep_root_y, id_x, id_y, rep_x, rep_y, id);
+            rep_root_x, rep_root_y, id_x, id_y, rep_x, rep_y);
     t = clock() - t;
     time_used = n*t/CLOCKS_PER_SEC;
     cout << "verification result : " << verify_result << endl;
@@ -169,7 +165,7 @@ void test_iup(){
 
 int main () {
     prc_initialize();
-    //test_hpc();
-    //test_lp();
+    test_hpc();
+    test_lp();
     test_iup();
 }
