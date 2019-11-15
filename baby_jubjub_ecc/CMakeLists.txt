@@ -2,7 +2,7 @@ include_directories(.)
 
 add_executable(
   main
-        main.cpp
+        test_prc.cpp
 )
 
 add_library(

@@ -6,6 +6,16 @@ using namespace std;
 clock_t t;
 double time_used;
 int n = 50;
+ulong BinaryToDec(bool x[], int d) {
+    ulong res = 0;
+    for(int i = 0; i < d; i++){
+        if (x[i]) {
+            res = res << 1 + 1;
+        } else {
+            res = res << 1;
+        }
+    }
+}
 void test_hpc(){
     cout <<"Test pedersen commitment" <<endl;
     t = clock();
@@ -81,6 +91,8 @@ void test_iup(){
     infile >> depth;
     bool id_address_bits[depth];
     bool rep_address_bits[depth];
+    ulong id_address;
+    ulong rep_address;
     char* id_path[depth*2];
     char* rep_path[depth*2];
     char* id_leaf_x;
@@ -135,6 +147,8 @@ void test_iup(){
     char* id_y = "16366639365004517936716040800897479058579589069997927276858356063876961184474";
     char* rep_x = "18517123153863469553573384572371536953407444696640934598826194274645946323334";
     char* rep_y = "16366639365004517936716040800897479058579589069997927276858356063876961184474";
+    id_address = BinaryToDec(id_address_bits, depth);
+    rep_address = BinaryToDec(rep_address_bits, depth);
 
     t = clock();
     prc_paramgen_iup(depth);
@@ -145,8 +159,8 @@ void test_iup(){
 
     unsigned char proof [312];
     t = clock();
-    prc_prove_iup(proof, depth, id_address_bits, id_leaf_x, id_leaf_y, id_root_x, id_root_y, id_path,
-            rep_address_bits, rep_leaf_x, rep_leaf_y, rep_root_x, rep_root_y, rep_path,
+    prc_prove_iup(proof, depth, id_address, id_leaf_x, id_leaf_y, id_root_x, id_root_y, id_path,
+            rep_address, rep_leaf_x, rep_leaf_y, rep_root_x, rep_root_y, rep_path,
             id_m, id_r, id_x, id_y, rep_m, rep_r, rep_x, rep_y);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
@@ -166,6 +180,6 @@ void test_iup(){
 int main () {
     prc_initialize();
     test_hpc();
-    test_lp();
-    test_iup();
+    //test_lp();
+    //test_iup();
 }
