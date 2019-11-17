@@ -49,15 +49,16 @@ void test_hpc(){
 void test_lp(){
     cout <<"Test leader proof" <<endl;
     char* block_hash = "1234";
-    char* T = "12845949072827470624709637419912138308739243446882777103948483823386985213512";
+    char* total_rep = "10";
     char* sn_x = "18517123153863469553573384572371536953407444696640934598826194274645946323334";
     char* sn_y = "16366639365004517936716040800897479058579589069997927276858356063876961184474";
     char* rep_x = "18517123153863469553573384572371536953407444696640934598826194274645946323334";
     char* rep_y = "16366639365004517936716040800897479058579589069997927276858356063876961184474";
     int sl = 1;
-
+    int d = 1;
+    int n = 4;
     t = clock();
-    prc_paramgen_lp();
+    prc_paramgen_lp(d, n);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "initialize success--------------------------------------" << endl;
@@ -65,14 +66,14 @@ void test_lp(){
 
     unsigned char proof [312];
     t = clock();
-    prc_prove_lp(proof, 2, 2, sn_x, sn_y,T, 2,2, rep_x, rep_y,block_hash, sl);
+    prc_prove_lp(proof, 2, 2, sn_x, sn_y,total_rep, 2,2, rep_x, rep_y,block_hash, sl, d, n);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "prove success--------------------------------------" << endl;
     cout << "prove time used: " << time_used<< endl;
 
     t = clock();
-    bool verify_result = prc_verify_lp(proof, sn_x, sn_y,T, rep_x, rep_y,block_hash, sl);
+    bool verify_result = prc_verify_lp(proof, sn_x, sn_y,total_rep, rep_x, rep_y,block_hash, sl);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "verification result : " << verify_result << endl;
@@ -181,6 +182,6 @@ void test_iup(){
 int main () {
     prc_initialize();
     //test_hpc();
-    //test_lp();
-    test_iup();
+    test_lp();
+    //test_iup();
 }

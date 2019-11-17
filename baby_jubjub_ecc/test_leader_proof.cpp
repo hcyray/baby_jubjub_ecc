@@ -25,11 +25,12 @@ int main () {
     FieldT sn_y = FieldT("16366639365004517936716040800897479058579589069997927276858356063876961184474");
     FieldT rep_x = FieldT("18517123153863469553573384572371536953407444696640934598826194274645946323334");
     FieldT rep_y = FieldT("16366639365004517936716040800897479058579589069997927276858356063876961184474");
-    FieldT T = FieldT("12845949072827470624709637419912138308739243446882777103948483823386985213512");
-
-    leader.reset(new leader_proof<FieldT>(pb, "leader_proof"));
+    FieldT total_rep = FieldT("10");
+    size_t d = 1;
+    size_t n = 4;
+    leader.reset(new leader_proof<FieldT>(pb, d, n, "leader_proof"));
     leader -> generate_r1cs_constraints();
-    leader -> generate_r1cs_witness(sn_m, sn_r, sn_x, sn_y, T, rep_m, rep_r, rep_x, rep_y, block_hash, sl);
+    leader -> generate_r1cs_witness(sn_m, sn_r, sn_x, sn_y, total_rep, rep_m, rep_r, rep_x, rep_y, block_hash, sl);
     const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
 
     const r1cs_ppzksnark_keypair<libff::alt_bn128_pp> keypair = r1cs_ppzksnark_generator<libff::alt_bn128_pp>(constraint_system);
@@ -41,8 +42,6 @@ int main () {
 
     cout << pb.is_satisfied() << endl;
     cout << "Number of R1CS constraints: " << constraint_system.num_constraints() << endl;
-    //cout << "Primary (public) input: " << pb.primary_input() << endl;
-    //cout << "Auxiliary (private) input: " << pb.auxiliary_input() << endl;
     cout << "Verification status: " << verified << endl;
 
     std::stringstream proof_data;
