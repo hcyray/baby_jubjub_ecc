@@ -76,7 +76,7 @@ int main () {
     r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
     r1cs_ppzksnark_keypair<libff::alt_bn128_pp> keypair = r1cs_ppzksnark_generator<libff::alt_bn128_pp>(constraint_system);
     r1cs_ppzksnark_proof<libff::alt_bn128_pp> proof = r1cs_ppzksnark_prover<libff::alt_bn128_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
-
+/*
     bool result = r1cs_ppzksnark_verifier_strong_IC<libff::alt_bn128_pp>(keypair.vk, pb.primary_input(), proof);
     cout << "verification result:" << result <<endl;
     std::stringstream proof_data;
@@ -86,6 +86,6 @@ int main () {
     cout << "proof size :" << proof_str.size() << endl;
     cout << "primary input:" <<pb.primary_input() << endl;
 
-    cout  << "primary input size: "<<constraint_system.primary_input_size << endl;
+    cout  << "primary input size: "<<constraint_system.primary_input_size << endl;*/
 }
 

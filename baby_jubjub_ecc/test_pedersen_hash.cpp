@@ -16,14 +16,19 @@ int main () {
 
     //pb.set_input_sizes(2);
 
-    FieldT commitment_x = FieldT("17777552123799933955779906779655732241715742912184938656739573121738514868268");
-    FieldT commitment_y = FieldT("2626589144620713026669568689430873010625803728049924121243784502389097019475");
-    FieldT m = FieldT("1");
-    FieldT r = FieldT("1");
+    FieldT commitment_x = FieldT("0");
+    FieldT commitment_y = FieldT("1");
+    FieldT m = FieldT("17777552123799933955779906779655732241715742912184938656739573121738514868268");
+    FieldT r = FieldT("2626589144620713026669568689430873010625803728049924121243784502389097019475");
     jubjub_pedersen_hash.reset(new out_pedersen_hash<FieldT> (pb,  "Pedersen Hash"));
     jubjub_pedersen_hash->generate_r1cs_constraints();
     jubjub_pedersen_hash->generate_r1cs_witness(commitment_x, commitment_y, m, r);
-
+    if( ! pb.is_satisfied() ) {
+        std::cerr << "Not satisfied!" << std::endl;
+    } else {
+        cout << "True" << endl;
+    }
+    /*
     r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
     r1cs_ppzksnark_keypair<libff::alt_bn128_pp> keypair = r1cs_ppzksnark_generator<libff::alt_bn128_pp>(constraint_system);
     r1cs_ppzksnark_proof<libff::alt_bn128_pp> proof = r1cs_ppzksnark_prover<libff::alt_bn128_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
@@ -43,6 +48,6 @@ int main () {
     cout <<  pb.num_variables() << endl;
     cout  <<"primary input size:" <<constraint_system.primary_input_size << endl;
     cout <<  pb.primary_input() << endl;
-
+*/
     return 0;
 }

@@ -10,11 +10,12 @@ ulong BinaryToDec(bool x[], int d) {
     ulong res = 0;
     for(int i = 0; i < d; i++){
         if (x[i]) {
-            res = res << 1 + 1;
+            res = (res << 1) + 1;
         } else {
             res = res << 1;
         }
     }
+    return res;
 }
 void test_hpc(){
     cout <<"Test pedersen commitment" <<endl;
@@ -156,7 +157,7 @@ void test_iup(){
     time_used = t/CLOCKS_PER_SEC;
     cout << "initialize success--------------------------------------" << endl;
     cout << "initialize time used: " << time_used<< endl;
-
+    //cout << depth <<" " << id_address<<" " << id_leaf_x<<" " << rep_path<<endl;
     unsigned char proof [312];
     t = clock();
     prc_prove_iup(proof, depth, id_address, id_leaf_x, id_leaf_y, id_root_x, id_root_y, id_path,
@@ -179,7 +180,7 @@ void test_iup(){
 
 int main () {
     prc_initialize();
-    test_hpc();
+    //test_hpc();
     //test_lp();
-    //test_iup();
+    test_iup();
 }
