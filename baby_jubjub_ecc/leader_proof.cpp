@@ -119,12 +119,12 @@ void leader_proof<FieldT>::generate_r1cs_witness(const FieldT &in_sn_m, const Fi
     pack_rn -> generate_r1cs_witness_from_bits();
     this -> pb.val(repRN) = this -> pb.val(total_rep) * this-> pb.val(rn);
     this -> pb.val(repDiff) = this->pb.val(rep) * (FieldT(2)^(n+difficulty));
-    cout << this -> pb.val(rn_commitment_x) << endl;
-    cout << this -> pb.val(rn_commitment_y) << endl;
-    cout << this -> pb.val(full_rn_pack) << endl;
-    cout << this -> pb.val(rn) << endl;
-    cout << this -> pb.val(repRN) << endl;
-    cout << this -> pb.val(repDiff) << endl;
+//    cout << this -> pb.val(rn_commitment_x) << endl;
+//    cout << this -> pb.val(rn_commitment_y) << endl;
+//    cout << this -> pb.val(full_rn_pack) << endl;
+//    cout << this -> pb.val(rn) << endl;
+//    cout << this -> pb.val(repRN) << endl;
+//    cout << this -> pb.val(repDiff) << endl;
     rangeProof->generate_r1cs_witness();
 }
 
