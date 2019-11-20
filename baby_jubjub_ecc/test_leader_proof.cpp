@@ -25,12 +25,14 @@ int main () {
     FieldT sn_y = FieldT("16366639365004517936716040800897479058579589069997927276858356063876961184474");
     FieldT rep_x = FieldT("18517123153863469553573384572371536953407444696640934598826194274645946323334");
     FieldT rep_y = FieldT("16366639365004517936716040800897479058579589069997927276858356063876961184474");
+    FieldT rn_x = FieldT("17340275048943653547614489228527344381464164653252141404090367775488601412428");
+    FieldT rn_y = FieldT("933123352423928023129012374387605308470368372720613198607919169954889220173");
     FieldT total_rep = FieldT("10");
-    size_t d = 1;
-    size_t n = 4;
+    size_t d = 3;
+    size_t n = 10;
     leader.reset(new leader_proof<FieldT>(pb, d, n, "leader_proof"));
     leader -> generate_r1cs_constraints();
-    leader -> generate_r1cs_witness(sn_m, sn_r, sn_x, sn_y, total_rep, rep_m, rep_r, rep_x, rep_y, block_hash, sl);
+    leader -> generate_r1cs_witness(sn_m, sn_r, sn_x, sn_y, total_rep, rep_m, rep_r, rep_x, rep_y, block_hash, sl, rn_x, rn_y);
     const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
 
     const r1cs_ppzksnark_keypair<libff::alt_bn128_pp> keypair = r1cs_ppzksnark_generator<libff::alt_bn128_pp>(constraint_system);
