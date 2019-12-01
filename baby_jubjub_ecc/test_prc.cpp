@@ -184,6 +184,6 @@ void test_iup(){
 int main () {
     prc_initialize();
     //test_hpc();
-    test_lp();
-    //test_iup();
+    //test_lp();
+    test_iup();
 }

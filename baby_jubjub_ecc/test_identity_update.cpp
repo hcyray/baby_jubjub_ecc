@@ -6,7 +6,7 @@ using namespace std;
 using namespace libsnark;
 int main () {
 
-    libff::alt_bn128_pp::init_public_params();
+    libff::bn128_pp::init_public_params();
     ProtoboardT pb;
 
     vector<FieldT> id_address_bits, rep_address_bits;
@@ -74,10 +74,10 @@ int main () {
         cout << "True" << endl;
     }
     r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
-    r1cs_ppzksnark_keypair<libff::alt_bn128_pp> keypair = r1cs_ppzksnark_generator<libff::alt_bn128_pp>(constraint_system);
-    r1cs_ppzksnark_proof<libff::alt_bn128_pp> proof = r1cs_ppzksnark_prover<libff::alt_bn128_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
+    r1cs_ppzksnark_keypair<libff::bn128_pp> keypair = r1cs_ppzksnark_generator<libff::bn128_pp>(constraint_system);
+    r1cs_ppzksnark_proof<libff::bn128_pp> proof = r1cs_ppzksnark_prover<libff::bn128_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
 /*
-    bool result = r1cs_ppzksnark_verifier_strong_IC<libff::alt_bn128_pp>(keypair.vk, pb.primary_input(), proof);
+    bool result = r1cs_ppzksnark_verifier_strong_IC<libff::bn128_pp>(keypair.vk, pb.primary_input(), proof);
     cout << "verification result:" << result <<endl;
     std::stringstream proof_data;
     proof_data << proof;

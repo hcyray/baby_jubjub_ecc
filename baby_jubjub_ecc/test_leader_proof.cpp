@@ -4,9 +4,9 @@
 using namespace std;
 
 int main () {
-    typedef libff::Fr<libff::alt_bn128_pp> FieldT;
+    typedef libff::Fr<libff::bn128_pp> FieldT;
 
-    libff::alt_bn128_pp::init_public_params();
+    libff::bn128_pp::init_public_params();
 
     protoboard<FieldT> pb;
 
@@ -35,11 +35,11 @@ int main () {
     leader -> generate_r1cs_witness(sn_m, sn_r, sn_x, sn_y, total_rep, rep_m, rep_r, rep_x, rep_y, block_hash, sl, rn_x, rn_y);
     const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
 
-    const r1cs_ppzksnark_keypair<libff::alt_bn128_pp> keypair = r1cs_ppzksnark_generator<libff::alt_bn128_pp>(constraint_system);
+    const r1cs_ppzksnark_keypair<libff::bn128_pp> keypair = r1cs_ppzksnark_generator<libff::bn128_pp>(constraint_system);
 
-    const r1cs_ppzksnark_proof<libff::alt_bn128_pp> proof = r1cs_ppzksnark_prover<libff::alt_bn128_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
+    const r1cs_ppzksnark_proof<libff::bn128_pp> proof = r1cs_ppzksnark_prover<libff::bn128_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
 
-    bool verified = r1cs_ppzksnark_verifier_strong_IC<libff::alt_bn128_pp>(keypair.vk, pb.primary_input(), proof);
+    bool verified = r1cs_ppzksnark_verifier_strong_IC<libff::bn128_pp>(keypair.vk, pb.primary_input(), proof);
 
 
     cout << pb.is_satisfied() << endl;

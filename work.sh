@@ -5,7 +5,9 @@ cd ..
 cd depends/libsnark/libsnark
 cp libsnark.a ~/hkust/go_project/src/github.com/uchihatmtkinu/PriRC/snark
 cd ..
-cd depends/libff/libff 
+cd depends/
+cp libzm.a ~/hkust/go_project/src/github.com/uchihatmtkinu/PriRC/snark
+cd libff/libff
 cp libff.a ~/hkust/go_project/src/github.com/uchihatmtkinu/PriRC/snark
 
 

@@ -6,8 +6,8 @@
 using namespace std;
 
 int main () {
-    typedef libff::Fr<libff::alt_bn128_pp> FieldT;
-    libff::alt_bn128_pp::init_public_params();
+    typedef libff::Fr<libff::bn128_pp> FieldT;
+    libff::bn128_pp::init_public_params();
     protoboard<FieldT> pb;
     std::shared_ptr<out_pedersen_hash<FieldT>> jubjub_pedersen_hash;
 
@@ -30,10 +30,10 @@ int main () {
     }
     /*
     r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
-    r1cs_ppzksnark_keypair<libff::alt_bn128_pp> keypair = r1cs_ppzksnark_generator<libff::alt_bn128_pp>(constraint_system);
-    r1cs_ppzksnark_proof<libff::alt_bn128_pp> proof = r1cs_ppzksnark_prover<libff::alt_bn128_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
+    r1cs_ppzksnark_keypair<libff::bn128_pp> keypair = r1cs_ppzksnark_generator<libff::bn128_pp>(constraint_system);
+    r1cs_ppzksnark_proof<libff::bn128_pp> proof = r1cs_ppzksnark_prover<libff::bn128_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
 
-    bool result = r1cs_ppzksnark_verifier_strong_IC<libff::alt_bn128_pp>(keypair.vk, pb.primary_input(), proof);
+    bool result = r1cs_ppzksnark_verifier_strong_IC<libff::bn128_pp>(keypair.vk, pb.primary_input(), proof);
 
     cout << "verification result:" << result << endl;
     cout << "actual commit value x :" << pb.val(jubjub_pedersen_hash->get_res_x()) << endl;
