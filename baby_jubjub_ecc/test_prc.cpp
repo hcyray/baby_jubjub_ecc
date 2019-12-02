@@ -59,6 +59,7 @@ void test_lp(){
     int sl = 1;
     int d = 0;
     int n = 10;
+    int avg_rep = 1;
     t = clock();
     prc_paramgen_lp(d, n);
     t = clock() - t;
@@ -68,14 +69,14 @@ void test_lp(){
 
     unsigned char proof [312];
     t = clock();
-    prc_prove_lp(proof, 2+30000000000, 2, sn_x, sn_y,total_rep, 2+30000000000,2, rep_x, rep_y,block_hash, sl,rn_x, rn_y, d, n);
+    prc_prove_lp(proof, 2+30000000000, 2, sn_x, sn_y,total_rep, 2+30000000000,2, rep_x, rep_y,block_hash, sl,rn_x, rn_y, d, n, avg_rep);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "prove success--------------------------------------" << endl;
     cout << "prove time used: " << time_used<< endl;
 
     t = clock();
-    bool verify_result = prc_verify_lp(proof, sn_x, sn_y,total_rep, rep_x, rep_y,block_hash, sl ,rn_x, rn_y);
+    bool verify_result = prc_verify_lp(proof, sn_x, sn_y,total_rep, rep_x, rep_y,block_hash, sl ,rn_x, rn_y, avg_rep);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "verification result : " << verify_result << endl;
@@ -144,7 +145,7 @@ void test_iup(){
     id_root_y = &id_root_y_str[0];
     rep_root_y = &rep_root_y_str[0];
     infile.close();
-
+    int w = 2;
     ulong id_m = 2, id_r = 2;
     ulong rep_m = 2, rep_r = 2;
     char* id_x = "18517123153863469553573384572371536953407444696640934598826194274645946323334";
@@ -155,7 +156,7 @@ void test_iup(){
     rep_address = BinaryToDec(rep_address_bits, depth);
 
     t = clock();
-    prc_paramgen_iup(depth);
+    prc_paramgen_iup(depth, w);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "initialize success--------------------------------------" << endl;
@@ -165,7 +166,7 @@ void test_iup(){
     t = clock();
     prc_prove_iup(proof, depth, id_address, id_leaf_x, id_leaf_y, id_root_x, id_root_y, id_path,
             rep_address, rep_leaf_x, rep_leaf_y, rep_root_x, rep_root_y, rep_path,
-            id_m, id_r, id_x, id_y, rep_m, rep_r, rep_x, rep_y);
+            id_m, id_r, id_x, id_y, rep_m, rep_r, rep_x, rep_y, w);
     t = clock() - t;
     time_used = t/CLOCKS_PER_SEC;
     cout << "prove success--------------------------------------" << endl;
@@ -173,7 +174,7 @@ void test_iup(){
 
     t = clock();
     bool verify_result = prc_verify_iup(proof, id_root_x, id_root_y,
-            rep_root_x, rep_root_y, id_x, id_y, rep_x, rep_y);
+            rep_root_x, rep_root_y, id_x, id_y, rep_x, rep_y, w);
     t = clock() - t;
     time_used = n*t/CLOCKS_PER_SEC;
     cout << "verification result : " << verify_result << endl;

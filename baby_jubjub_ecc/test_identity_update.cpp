@@ -53,10 +53,10 @@ int main () {
     rep_x = FieldT("18517123153863469553573384572371536953407444696640934598826194274645946323334");
     rep_y = FieldT("16366639365004517936716040800897479058579589069997927276858356063876961184474");
 
-
+    size_t  w = 2;
     size_t tree_depth = 2;
     identity_update_proof auth(
-            pb, tree_depth,
+            pb, tree_depth, w,
             " id update");
 
 
@@ -76,7 +76,6 @@ int main () {
     r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
     r1cs_ppzksnark_keypair<libff::bn128_pp> keypair = r1cs_ppzksnark_generator<libff::bn128_pp>(constraint_system);
     r1cs_ppzksnark_proof<libff::bn128_pp> proof = r1cs_ppzksnark_prover<libff::bn128_pp>(keypair.pk, pb.primary_input(), pb.auxiliary_input());
-/*
     bool result = r1cs_ppzksnark_verifier_strong_IC<libff::bn128_pp>(keypair.vk, pb.primary_input(), proof);
     cout << "verification result:" << result <<endl;
     std::stringstream proof_data;
@@ -86,6 +85,6 @@ int main () {
     cout << "proof size :" << proof_str.size() << endl;
     cout << "primary input:" <<pb.primary_input() << endl;
 
-    cout  << "primary input size: "<<constraint_system.primary_input_size << endl;*/
+    cout  << "primary input size: "<<constraint_system.primary_input_size << endl;
 }
 

@@ -13,26 +13,26 @@ int main () {
 
     std::shared_ptr<leader_proof<FieldT>> leader;
 
-    FieldT sn_m = FieldT("2");
+    FieldT sn_m = FieldT("30000000002");
     FieldT sn_r = FieldT("2");
-    FieldT rep_m = FieldT("2");
+    FieldT rep_m = FieldT("30000000002");
     FieldT rep_r = FieldT("2");
-    FieldT block_hash = FieldT("1234");
+    FieldT block_hash = FieldT("29852648006495581632639394572552351243421167921610457916422658377040103735296");
     FieldT sl = FieldT("1");
+    FieldT avg_rep = FieldT("1");
 
-
-    FieldT sn_x = FieldT("18517123153863469553573384572371536953407444696640934598826194274645946323334");
-    FieldT sn_y = FieldT("16366639365004517936716040800897479058579589069997927276858356063876961184474");
-    FieldT rep_x = FieldT("18517123153863469553573384572371536953407444696640934598826194274645946323334");
-    FieldT rep_y = FieldT("16366639365004517936716040800897479058579589069997927276858356063876961184474");
-    FieldT rn_x = FieldT("17340275048943653547614489228527344381464164653252141404090367775488601412428");
-    FieldT rn_y = FieldT("933123352423928023129012374387605308470368372720613198607919169954889220173");
+    FieldT sn_x = FieldT("6468125633283523844081138403201428527072905892236409266890308262966770366270");
+    FieldT sn_y = FieldT("15599159073676304331609141418095610264573471298139509244854073578575099976066");
+    FieldT rep_x = FieldT("6468125633283523844081138403201428527072905892236409266890308262966770366270");
+    FieldT rep_y = FieldT("15599159073676304331609141418095610264573471298139509244854073578575099976066");
+    FieldT rn_x = FieldT("13647547311933543444637307980047256750971254683623422165118646954184898163653");
+    FieldT rn_y = FieldT("11273894275322725312797439907538424583649707310938481045408412348190690865322");
     FieldT total_rep = FieldT("10");
-    size_t d = 3;
+    size_t d = 0;
     size_t n = 10;
     leader.reset(new leader_proof<FieldT>(pb, d, n, "leader_proof"));
     leader -> generate_r1cs_constraints();
-    leader -> generate_r1cs_witness(sn_m, sn_r, sn_x, sn_y, total_rep, rep_m, rep_r, rep_x, rep_y, block_hash, sl, rn_x, rn_y);
+    leader -> generate_r1cs_witness(sn_m, sn_r, sn_x, sn_y, total_rep, rep_m, rep_r, rep_x, rep_y, block_hash, sl, rn_x, rn_y, avg_rep);
     const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
 
     const r1cs_ppzksnark_keypair<libff::bn128_pp> keypair = r1cs_ppzksnark_generator<libff::bn128_pp>(constraint_system);

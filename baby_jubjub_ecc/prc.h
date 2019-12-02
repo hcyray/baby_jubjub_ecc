@@ -44,7 +44,8 @@ void prc_prove_lp(
         char* rn_x,
         char* rn_y,
         int d,
-        int n
+        int n,
+        ulong avg_rep
 );
 bool prc_verify_lp(
         void *output_proof_ptr,
@@ -56,7 +57,8 @@ bool prc_verify_lp(
         char* block_hash,
         int sl,
         char* rn_x,
-        char* rn_y
+        char* rn_y,
+        ulong avg_rep
 );
 void prc_paramgen_lp(int d, int n);
 
@@ -69,16 +71,16 @@ void prc_prove_iup(
         ulong in_rep_address, char* rep_leaf_x, char * rep_leaf_y,
         char* rep_root_x, char* root_rep_y, char* in_rep_path[],
         ulong id_m, ulong id_r, char* id_x, char* id_y,
-        ulong rep_m, ulong rep_r, char* rep_x, char* rep_y
+        ulong rep_m, ulong rep_r, char* rep_x, char* rep_y, int w
 );
 bool prc_verify_iup(
         void *proof_ptr,
         char* old_id_root_x, char* old_id_root_y,
         char* old_rep_root_x, char* old_rep_root_y,
         char* new_id_x, char* new_id_y,
-        char* new_rep_x, char* new_rep_y
+        char* new_rep_x, char* new_rep_y, int w
 );
-void prc_paramgen_iup(int depth);
+void prc_paramgen_iup(int depth, int w);
 
 
 #ifdef __cplusplus
