@@ -84,6 +84,37 @@ void test_lp(){
     cout << "Finish--------------------------------------" << endl;
 }
 
+void test_pow(){
+    cout <<"Test pow proof" <<endl;
+    char* block_hash = "1234";
+    char* rep_x = "18517123153863469553573384572371536953407444696640934598826194274645946323334";
+    char* rep_y = "16366639365004517936716040800897479058579589069997927276858356063876961184474";
+
+    t = clock();
+    prc_paramgen_pow();
+    t = clock() - t;
+    time_used = t/CLOCKS_PER_SEC;
+    cout << "initialize success--------------------------------------" << endl;
+    cout << "initialize time used: " << time_used<< endl;
+
+    unsigned char proof [312];
+    t = clock();
+    prc_prove_pow(proof, 2, 2,  rep_x, rep_y,1, block_hash);
+    t = clock() - t;
+    time_used = t/CLOCKS_PER_SEC;
+    cout << "prove success--------------------------------------" << endl;
+    cout << "prove time used: " << time_used<< endl;
+
+    t = clock();
+    bool verify_result = prc_verify_pow(proof, rep_x, rep_y,block_hash);
+    t = clock() - t;
+    time_used = t/CLOCKS_PER_SEC;
+    cout << "verification result : " << verify_result << endl;
+    cout << "verification time used: " << t<< endl;
+    cout << "verification time used: " << CLOCKS_PER_SEC<< endl;
+    cout << "Finish--------------------------------------" << endl;
+}
+
 void test_iup(){
     cout <<"Test identity update proof" <<endl;
     ifstream infile;
@@ -186,5 +217,6 @@ int main () {
     prc_initialize();
     //test_hpc();
     //test_lp();
-    test_iup();
+    //test_iup();
+    test_pow();
 }

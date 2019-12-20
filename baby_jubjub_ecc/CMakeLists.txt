@@ -2,7 +2,7 @@ include_directories(.)
 
 add_executable(
   main
-        test_pow_proof.cpp
+        test_prc.cpp
 )
 
 add_library(

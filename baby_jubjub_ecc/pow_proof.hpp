@@ -10,15 +10,14 @@
 #include <memory>
 #include "pedersen_hash.hpp"
 #include <libsnark/gadgetlib1/gadget.hpp>
-
+#include "libsnark/gadgetlib1/gadgets/basic_gadgets.hpp"
 using namespace libsnark;
 
 template<typename FieldT>
 class pow_proof : public gadget<FieldT> {
 private:
     /* no internal variables */
-    int n_cmp;
-    int n;
+    size_t n_cmp;
     pb_variable<FieldT>     rep;
     pb_variable<FieldT>     target;
     pb_variable<FieldT>     nonce;
@@ -26,7 +25,6 @@ private:
     pb_variable_array<FieldT> diff_T;
     pb_variable_array<FieldT> rep_relation;
     pb_variable_array<FieldT> diff_relation;
-    pb_variable_array<FieldT> conj_result;
     pb_variable_array<FieldT> rep_m;
     pb_variable_array<FieldT> rep_r;
     std::shared_ptr<pedersen_commitment<FieldT>> repCommit;

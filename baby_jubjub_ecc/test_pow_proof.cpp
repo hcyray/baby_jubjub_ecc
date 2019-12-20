@@ -11,6 +11,8 @@ int main()
 
 
     protoboard<FieldT> pb;
+    std::shared_ptr<pow_proof<FieldT>> powProof;
+
     FieldT rep_m = FieldT("2");
     FieldT rep_r = FieldT("2");
     FieldT block = FieldT("1234");
@@ -19,9 +21,12 @@ int main()
     FieldT rep_y = FieldT("16366639365004517936716040800897479058579589069997927276858356063876961184474");
 
     pb.set_input_sizes(1);
-    pow_proof<FieldT> powProof(pb, "mul_cmp");
-    powProof.generate_r1cs_constraints();
-    powProof.generate_r1cs_witness(rep_m, rep_r, rep_x, rep_y, nonce, block);
+    powProof.reset(new pow_proof<FieldT>(pb, "pow_proof"));
+
+    powProof->generate_r1cs_constraints();
+
+    powProof->generate_r1cs_witness(rep_m, rep_r, rep_x, rep_y, nonce, block);
+    cout <<"corret"<<endl;
     const r1cs_constraint_system<FieldT> constraint_system = pb.get_constraint_system();
 
     const r1cs_ppzksnark_keypair<libff::bn128_pp> keypair = r1cs_ppzksnark_generator<libff::bn128_pp>(constraint_system);
