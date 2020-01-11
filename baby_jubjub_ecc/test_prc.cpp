@@ -115,10 +115,13 @@ void test_pow(){
     cout << "Finish--------------------------------------" << endl;
 }
 
-void test_iup(){
+void test_iup(int n, int w){
+    w=  w+1;
+    string iup_f = "iup_" + to_string(n);
+
     cout <<"Test identity update proof" <<endl;
     ifstream infile;
-    infile.open("iup_10");
+    infile.open(iup_f);
     if(!infile) {
         cerr << "Unable to open file txt";
         exit(1);
@@ -176,7 +179,6 @@ void test_iup(){
     id_root_y = &id_root_y_str[0];
     rep_root_y = &rep_root_y_str[0];
     infile.close();
-    int w = 2;
     ulong id_m = 2, id_r = 2;
     ulong rep_m = 2, rep_r = 2;
     char* id_x = "18517123153863469553573384572371536953407444696640934598826194274645946323334";
@@ -218,6 +220,10 @@ int main () {
     prc_initialize();
     //test_hpc();
     //test_lp();
-    test_iup();
+    int n;
+    int w;
+    cin >> n;
+    cin >> w;
+    test_iup(n ,w);
     //test_pow();
 }
