@@ -22,7 +22,7 @@ void test_hpc(){
     t = clock();
     prc_paramgen_hpc();
     t = clock() - t;
-    time_used = t/CLOCKS_PER_SEC;
+    time_used = t/(CLOCKS_PER_SEC/1000);
     cout << "initialize success--------------------------------------" << endl;
     cout << "initialize time used: " << time_used<< endl;
 
@@ -33,14 +33,14 @@ void test_hpc(){
     t = clock();
     prc_prove_hpc(proof, 2, 2, comm_x, comm_y);
     t = clock() - t;
-    time_used = t/CLOCKS_PER_SEC;
+    time_used = t/(CLOCKS_PER_SEC/1000);
     cout << "prove success--------------------------------------" << endl;
     cout << "prove time used: " << time_used<< endl;
 
     t = clock();
     bool verify_result = prc_verify_hpc(proof, comm_x, comm_y);
     t = clock() - t;
-    time_used = t/CLOCKS_PER_SEC;
+    time_used = t/(CLOCKS_PER_SEC/1000);
     cout << "verification result : " << verify_result << endl;
     cout << "verification time used: " << time_used<< endl;
     cout << "Finish--------------------------------------" << endl;
@@ -63,7 +63,7 @@ void test_lp(){
     t = clock();
     prc_paramgen_lp(d, n);
     t = clock() - t;
-    time_used = t/CLOCKS_PER_SEC;
+    time_used = t/(CLOCKS_PER_SEC/1000);
     cout << "initialize success--------------------------------------" << endl;
     cout << "initialize time used: " << time_used<< endl;
 
@@ -71,14 +71,14 @@ void test_lp(){
     t = clock();
     prc_prove_lp(proof, 2+30000000000, 2, sn_x, sn_y,total_rep, 2+30000000000,2, rep_x, rep_y,block_hash, sl,rn_x, rn_y, d, n, avg_rep);
     t = clock() - t;
-    time_used = t/CLOCKS_PER_SEC;
+    time_used = t/(CLOCKS_PER_SEC/1000);
     cout << "prove success--------------------------------------" << endl;
     cout << "prove time used: " << time_used<< endl;
 
     t = clock();
     bool verify_result = prc_verify_lp(proof, sn_x, sn_y,total_rep, rep_x, rep_y,block_hash, sl ,rn_x, rn_y, avg_rep);
     t = clock() - t;
-    time_used = t/CLOCKS_PER_SEC;
+    time_used = t/(CLOCKS_PER_SEC/1000);
     cout << "verification result : " << verify_result << endl;
     cout << "verification time used: " << time_used<< endl;
     cout << "Finish--------------------------------------" << endl;
@@ -93,7 +93,7 @@ void test_pow(){
     t = clock();
     prc_paramgen_pow();
     t = clock() - t;
-    time_used = t/CLOCKS_PER_SEC;
+    time_used = t/(CLOCKS_PER_SEC/1000);
     cout << "initialize success--------------------------------------" << endl;
     cout << "initialize time used: " << time_used<< endl;
 
@@ -101,24 +101,24 @@ void test_pow(){
     t = clock();
     prc_prove_pow(proof, 2, 2,  rep_x, rep_y,1, block_hash);
     t = clock() - t;
-    time_used = t/CLOCKS_PER_SEC;
+    time_used = t/(CLOCKS_PER_SEC/1000);
     cout << "prove success--------------------------------------" << endl;
     cout << "prove time used: " << time_used<< endl;
 
     t = clock();
     bool verify_result = prc_verify_pow(proof, rep_x, rep_y,block_hash);
     t = clock() - t;
-    time_used = t/CLOCKS_PER_SEC;
+    time_used = t/(CLOCKS_PER_SEC/1000);
     cout << "verification result : " << verify_result << endl;
     cout << "verification time used: " << t<< endl;
-    cout << "verification time used: " << CLOCKS_PER_SEC<< endl;
+    cout << "verification time used: " << (CLOCKS_PER_SEC/1000)<< endl;
     cout << "Finish--------------------------------------" << endl;
 }
 
 void test_iup(){
     cout <<"Test identity update proof" <<endl;
     ifstream infile;
-    infile.open("merkle.txt");
+    infile.open("iup_10");
     if(!infile) {
         cerr << "Unable to open file txt";
         exit(1);
@@ -189,7 +189,8 @@ void test_iup(){
     t = clock();
     prc_paramgen_iup(depth, w);
     t = clock() - t;
-    time_used = t/CLOCKS_PER_SEC;
+    time_used = t/(CLOCKS_PER_SEC/1000);
+    cout << "depth:"<< depth <<" w:"<< (w-1) << endl;
     cout << "initialize success--------------------------------------" << endl;
     cout << "initialize time used: " << time_used<< endl;
     //cout << depth <<" " << id_address<<" " << id_leaf_x<<" " << rep_path<<endl;
@@ -199,7 +200,7 @@ void test_iup(){
             rep_address, rep_leaf_x, rep_leaf_y, rep_root_x, rep_root_y, rep_path,
             id_m, id_r, id_x, id_y, rep_m, rep_r, rep_x, rep_y, w);
     t = clock() - t;
-    time_used = t/CLOCKS_PER_SEC;
+    time_used = t/(CLOCKS_PER_SEC/1000);
     cout << "prove success--------------------------------------" << endl;
     cout << "prove time used: " << time_used<< endl;
 
@@ -207,7 +208,7 @@ void test_iup(){
     bool verify_result = prc_verify_iup(proof, id_root_x, id_root_y,
             rep_root_x, rep_root_y, id_x, id_y, rep_x, rep_y, w);
     t = clock() - t;
-    time_used = n*t/CLOCKS_PER_SEC;
+    time_used = n*t/(CLOCKS_PER_SEC/1000);
     cout << "verification result : " << verify_result << endl;
     cout << "verification time used: " << time_used<< endl;
     cout << "Finish--------------------------------------" << endl;
@@ -217,6 +218,6 @@ int main () {
     prc_initialize();
     //test_hpc();
     //test_lp();
-    //test_iup();
-    test_pow();
+    test_iup();
+    //test_pow();
 }
