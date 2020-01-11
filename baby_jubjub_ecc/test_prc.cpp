@@ -219,11 +219,11 @@ void test_iup(int n, int w){
 int main () {
     prc_initialize();
     //test_hpc();
-    test_lp();
+    //test_lp();
     //int n;
     //int w;
     //cin >> n;
     //cin >> w;
     //test_iup(n ,w);
-    //test_pow();
+    test_pow();
 }
