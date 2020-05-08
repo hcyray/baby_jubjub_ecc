@@ -110,8 +110,7 @@ void test_pow(){
     t = clock() - t;
     time_used = t/(CLOCKS_PER_SEC/1000);
     cout << "verification result : " << verify_result << endl;
-    cout << "verification time used: " << t<< endl;
-    cout << "verification time used: " << (CLOCKS_PER_SEC/1000)<< endl;
+    cout << "verification time used: " << time_used<< endl;
     cout << "Finish--------------------------------------" << endl;
 }
 
@@ -218,12 +217,12 @@ void test_iup(int n, int w){
 
 int main () {
     prc_initialize();
-    test_hpc();
+    //test_hpc();
     //test_lp();
     //int n;
     //int w;
     //cin >> n;
     //cin >> w;
     //test_iup(n ,w);
-    //test_pow();
+    test_pow();
 }

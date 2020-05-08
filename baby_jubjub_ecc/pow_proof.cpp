@@ -21,7 +21,7 @@ pow_proof<FieldT>::pow_proof(protoboard<FieldT> &pb, const std::string &annotati
     rep_m.allocate(pb,253, FMT(annotation_prefix, "rep m"));
     rep_r.allocate(pb,253, FMT(annotation_prefix, "rep r"));
     nonce.allocate(pb, FMT(annotation_prefix,  "nonce"));
-    n_cmp = 14; // number of comparision
+    n_cmp = 20; // number of comparision
     rep_T.allocate(pb, n_cmp, FMT(this->annotation_prefix, " T for rep"));
     diff_T.allocate(pb,n_cmp, FMT(this->annotation_prefix, " T for diff"));
     for (int i = 0; i < n_cmp; i ++) {
